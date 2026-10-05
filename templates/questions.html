@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="{{ current_lang | default('en') }}" dir="{{ t.dir }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ t.quiz_app_title }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { background-color: #0b1329; color: #ffffff; font-family: {{ t.font }}; }
+        .quiz-card { background-color: #0f172a; border: 1px solid #1e293b; }
+        .option-btn { background-color: #111c44; border: 1px solid #1e293b; transition: all 0.2s ease; }
+        .option-btn:hover { border-color: #3b82f6; background-color: #172554; }
+        .option-btn.selected { border-color: #3b82f6; background-color: #172554; box-shadow: 0 0 15px rgba(59, 130, 246, 0.2); }
+        .option-btn.correct { border-color: #10b981 !important; background-color: rgba(16, 185, 129, 0.1) !important; color: #34d399; }
+        .option-btn.wrong { border-color: #ef4444 !important; background-color: rgba(239, 68, 68, 0.1) !important; color: #f87171; }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <!-- Fixed Top Navigation & Back Header -->
+    <div class="w-full fixed top-0 left-0 right-0 z-40 shadow-lg">
+        <!-- Top Navigation Bar -->
+        <header class="w-full py-3.5" style="background-color: #1e3a8a; border-bottom: 1px solid #1e293b;">
+            <div class="max-w-7xl mx-auto px-8 flex items-center justify-between">
+                <!-- Logo + Name -->
+                <a href="/" class="flex items-center gap-2 text-white font-medium text-sm hover:opacity-90 transition">
+                    <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                    </svg>
+                    <span class="tracking-wide">CyberLearn</span>
+                </a>
+
+                <!-- Globe Icon & Language Selector -->
+                <div class="relative flex items-center">
+                    <svg class="w-4 h-4 text-white/80 absolute {% if current_lang == 'ar' %}right-2.5{% else %}left-2.5{% endif %} pointer-events-none z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 002 2h1.5a2.5 2.5 0 002.5-2.5V7a2 2 0 00-2-2h-1.5A2.5 2.5 0 0112 2.5v-.565M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    
+                    <select onchange="window.location.href = this.value;" class="text-white text-xs rounded-lg {% if current_lang == 'ar' %}pl-7 pr-8{% else %}pl-8 pr-7{% endif %} py-1.5 focus:outline-none cursor-pointer appearance-none transition" style="background-color: #1e3a8a; border: 1px solid #1e293b;">
+                        <option value="/set_language/en" class="bg-[#1e3a8a] text-white" {% if current_lang == 'en' or not current_lang %}selected{% endif %}>English</option>
+                        <option value="/set_language/fr" class="bg-[#1e3a8a] text-white" {% if current_lang == 'fr' %}selected{% endif %}>Français</option>
+                        <option value="/set_language/ar" class="bg-[#1e3a8a] text-white" {% if current_lang == 'ar' %}selected{% endif %}>العربية</option>
+                    </select>
+
+                    <svg class="w-3 h-3 text-white/70 absolute {% if current_lang == 'ar' %}left-2{% else %}right-2{% endif %} pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </div>
+            </div>
+        </header>
+
+        <div class="w-full py-3 px-8 flex items-center justify-between" style="background-color: #0b1329; border-bottom: 1px solid #1e293b;">
+            <a href="/quiz" class="inline-flex items-center gap-2 text-gray-400 hover:text-white text-xs font-medium transition">
+                <i class="fas fa-arrow-left text-[10px]"></i>
+                {{ t.quiz_back_home }}
+            </a>
+            <div class="flex items-center gap-6 w-1/3">
+                <div class="flex justify-between w-full text-xs text-gray-400 font-medium">
+                    <span id="progress-text">{{ TRANSLATIONS[user_lang].get('quiz_complete', 'Complete') }}</span>
+                    <span id="progress-percent">{{ t.quiz_zero_percent }}</span>
+                </div>
+            </div>
+        </div>
+        <!-- Progress Bar Line -->
+        <div class="w-full bg-gray-900 h-1">
+            <div id="progress-bar" class="bg-blue-500 h-1 transition-all duration-300" style="width: 0%;"></div>
+        </div>
+    </div>
+
+    <!-- Main Content Container -->
+    <main class="max-w-2xl mx-auto px-6 pt-36 pb-16">
+        
+        <!-- Active Question Card View -->
+        <div id="quiz-view" class="quiz-card rounded-2xl p-7 shadow-2xl">
+            <div class="flex items-center justify-between mb-4">
+                <h2 id="question-text" class="text-sm font-semibold text-white leading-relaxed pr-4">{{ t.quiz_loading_question }}</h2>
+                <span id="question-badge" class="text-[11px] font-semibold px-3 py-1 rounded-full border whitespace-nowrap">{{ t.quiz_badge_easy }}</span>
+            </div>
+
+            <div id="options-container" class="space-y-3 mb-6">
+                <!-- Dynamically injected options go here -->
+            </div>
+
+            <!-- Explanation Box (Hidden initially) -->
+            <div id="explanation-box" class="hidden mb-6 p-4 rounded-xl bg-blue-950/30 border border-blue-600/30 text-xs text-gray-300 space-y-1">
+                <span class="font-bold uppercase tracking-wider text-blue-400 block text-[10px]">{{ t.quiz_explanation_label }}</span>
+                <p id="explanation-text" class="leading-relaxed"></p>
+            </div>
+
+            <div class="flex items-center justify-between pt-3 border-t border-gray-800">
+                <span id="question-counter" class="text-xs text-gray-400 font-medium">{{ TRANSLATIONS[user_lang].get('quiz_question_counter', 'Question') }}</span>
+                <div class="flex items-center gap-3">
+                    <button id="submit-btn" onclick="submitAnswer()" disabled class="px-5 py-2 rounded-xl text-xs font-semibold text-white bg-blue-600 hover:bg-blue-500 transition shadow-md shadow-blue-600/20 opacity-50 cursor-not-allowed">
+                        {{ t.quiz_submit_btn }}
+                    </button>
+                    <button id="next-btn" onclick="nextQuestion()" class="hidden px-5 py-2 rounded-xl text-xs font-semibold text-white bg-blue-600 hover:bg-blue-500 transition shadow-md shadow-blue-600/20">
+                        {{ t.quiz_next_btn }}
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Analytics View (Hidden initially) -->
+        <div id="results-view" class="hidden space-y-6">
+            
+            <!-- Top Section Header -->
+            <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center gap-3">
+                    <a href="/quiz" class="w-7 h-7 rounded-lg bg-gray-800 text-gray-300 flex items-center justify-center text-xs hover:bg-gray-700 transition"><i class="fas fa-arrow-left"></i></a>
+                    <div>
+                        <h2 class="text-base font-bold text-white flex items-center gap-2">
+                            <span>{{ t.quiz_complete_title }}</span>
+                            <span class="text-xs px-2 py-0.5 rounded bg-yellow-500/20 text-yellow-400 border border-yellow-500/30">🏆</span>
+                        </h2>
+                        <p class="text-[11px] text-gray-400">{{ t.quiz_complete_subtitle }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Two Column Grid for Score & Achievements -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
+                <!-- Score Card -->
+                <div class="quiz-card rounded-2xl p-6 shadow-xl text-center flex flex-col items-center justify-between bg-slate-900 border border-slate-800">
+                    <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4">{{ t.quiz_score_heading }}</h3>
+                    <div class="relative inline-flex items-center justify-center w-28 h-28 rounded-full border-4 border-yellow-500/80 mb-4 bg-yellow-500/5">
+                        <div class="text-center">
+                            <span id="score-fraction" class="text-xl font-bold text-yellow-400 block">0/0</span>
+                            <span id="score-percentage" class="text-[10px] text-gray-400">0%</span>
+                        </div>
+                    </div>
+                    <div class="space-y-1 mb-5">
+                        <h4 id="score-title" class="text-sm font-bold text-white">{{ t.quiz_score_default_title }}</h4>
+                        <p id="score-subtitle" class="text-[11px] text-gray-400">{{ t.quiz_score_loading }}</p>
+                    </div>
+                    <a href="/quiz" class="w-full py-2.5 rounded-xl text-xs font-semibold text-white bg-blue-600 hover:bg-blue-500 transition shadow-md shadow-blue-600/20 flex items-center justify-center gap-2">
+                        <i class="fas fa-redo text-[10px]"></i> {{ t.quiz_retake_btn }}
+                    </a>
+                </div>
+
+                <!-- Achievements Card -->
+                <div class="quiz-card rounded-2xl p-6 shadow-xl flex flex-col justify-between bg-slate-900 border border-slate-800">
+                    <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4">{{ t.quiz_achievements_heading }}</h3>
+                    <div class="space-y-2.5">
+                        <div class="p-3 rounded-xl bg-gradient-to-r from-blue-950/60 to-indigo-950/60 border border-blue-500/30 flex items-center justify-between text-xs">
+                            <div class="flex items-center gap-3">
+                                <div class="w-7 h-7 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center"><i class="fas fa-shield-alt text-xs"></i></div>
+                                <div>
+                                    <p class="font-bold text-white text-xs">{{ t.quiz_ach_novice_title }}</p>
+                                    <p class="text-gray-400 text-[10px]">{{ t.quiz_ach_novice_desc }}</p>
+                                </div>
+                            </div>
+                            <i class="fas fa-check-circle text-green-400 text-sm"></i>
+                        </div>
+
+                        <div id="achievement-phishing" class="p-3 rounded-xl bg-gradient-to-r from-emerald-950/60 to-teal-950/60 border border-emerald-500/30 flex items-center justify-between text-xs">
+                            <div class="flex items-center gap-3">
+                                <div class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center"><i class="fas fa-fish text-xs"></i></div>
+                                <div>
+                                    <p class="font-bold text-white text-xs">{{ t.quiz_ach_phishing_title }}</p>
+                                    <p class="text-gray-400 text-[10px]">{{ t.quiz_ach_phishing_desc }}</p>
+                                </div>
+                            </div>
+                            <i id="achievement-phishing-icon" class="fas fa-check-circle text-green-400 text-sm"></i>
+                        </div>
+
+                        <div id="achievement-guardian" class="p-3 rounded-xl bg-gray-900/50 border border-gray-800 flex items-center justify-between text-xs opacity-60">
+                            <div class="flex items-center gap-3">
+                                <div class="w-7 h-7 rounded-lg bg-gray-800 text-gray-500 flex items-center justify-center"><i class="fas fa-lock text-xs"></i></div>
+                                <div>
+                                    <p class="font-bold text-gray-300 text-xs">{{ t.quiz_ach_guardian_title }}</p>
+                                    <p class="text-gray-500 text-[10px]">{{ t.quiz_ach_guardian_desc }}</p>
+                                </div>
+                            </div>
+                            <i class="fas fa-lock text-gray-600 text-xs"></i>
+                        </div>
+
+                        <div id="achievement-expert" class="p-3 rounded-xl bg-gray-900/50 border border-gray-800 flex items-center justify-between text-xs opacity-60">
+                            <div class="flex items-center gap-3">
+                                <div class="w-7 h-7 rounded-lg bg-gray-800 text-gray-500 flex items-center justify-center"><i class="fas fa-lock text-xs"></i></div>
+                                <div>
+                                    <p class="font-bold text-gray-300 text-xs">{{ t.quiz_ach_expert_title }}</p>
+                                    <p class="text-gray-500 text-[10px]">{{ t.quiz_ach_expert_desc }}</p>
+                                </div>
+                            </div>
+                            <i class="fas fa-lock text-gray-600 text-xs"></i>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Recommendations Section -->
+            <div class="quiz-card rounded-2xl p-6 shadow-xl bg-slate-900 border border-slate-800">
+                <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                    <i class="fas fa-chart-line text-blue-400"></i> {{ t.quiz_recommendations_heading }}
+                </h3>
+                <div class="space-y-2 text-xs text-gray-300">
+                    <div class="p-3 rounded-xl bg-gray-900/60 border border-gray-800 flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                        {{ t.quiz_rec_1 }}
+                    </div>
+                    <div class="p-3 rounded-xl bg-gray-900/60 border border-gray-800 flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                        {{ t.quiz_rec_2 }}
+                    </div>
+                    <div class="p-3 rounded-xl bg-gray-900/60 border border-gray-800 flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                        {{ t.quiz_rec_3 }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Question Review List -->
+            <div class="quiz-card rounded-2xl p-6 shadow-xl bg-slate-900 border border-slate-800">
+                <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4">{{ t.quiz_review_heading }}</h3>
+                <div id="dynamic-review-container" class="space-y-3 text-xs">
+                    <!-- Populated dynamically via JS -->
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+    <!-- Script Section -->
+    <script>
+    let selectedOption = null;
+    let currentStep = 1;
+    let currentSessionId = null;
+    let questionsData = []; 
+    let totalQuestions = 10;
+    let correctAnswersCount = 0;
+    
+    const urlParams = new URLSearchParams(window.location.search);
+    const currentTopic = urlParams.get('topic') || 'Cybersecurity Fundamentals';
+    const currentDifficulty = urlParams.get('difficulty') || 'easy';
+
+    document.addEventListener("DOMContentLoaded", () => {
+        updateBadgeStyle(currentDifficulty);
+        console.log("Initializing Quiz for -> Topic:", currentTopic, "| Difficulty:", currentDifficulty);
+        initQuizSession(currentDifficulty, currentTopic);
+    });
+
+    function updateBadgeStyle(level) {
+        const badge = document.getElementById('question-badge');
+        if (!badge) return;
+        
+        const normalized = (level || 'easy').toLowerCase();
+        badge.innerText = normalized.charAt(0).toUpperCase() + normalized.slice(1);
+        
+        if (normalized === 'easy') {
+            badge.style.backgroundColor = 'rgba(6, 78, 59, 0.6)';
+            badge.style.color = '#34d399';
+            badge.style.borderColor = 'rgba(52, 211, 153, 0.3)';
+        } else if (normalized === 'medium') {
+            badge.style.backgroundColor = 'rgba(120, 53, 15, 0.6)';
+            badge.style.color = '#fbbf24';
+            badge.style.borderColor = 'rgba(251, 191, 36, 0.3)';
+        } else if (normalized === 'hard') {
+            badge.style.backgroundColor = 'rgba(127, 29, 29, 0.6)';
+            badge.style.color = '#f87171';
+            badge.style.borderColor = 'rgba(248, 113, 113, 0.3)';
+        } else {
+            badge.style.backgroundColor = 'rgba(30, 58, 138, 0.6)';
+            badge.style.color = '#60a5fa';
+            badge.style.borderColor = 'rgba(96, 165, 250, 0.3)';
+        }
+    }
+
+    function initQuizSession(difficulty, topic) {
+        const activeDifficulty = difficulty || currentDifficulty;
+        const activeTopic = topic || currentTopic;
+        
+        // Grab the current language from the <html> tag (e.g., 'en', 'fr', or 'ar')
+        const currentLang = document.documentElement.lang || 'en';
+
+        const questionTextEl = document.getElementById('question-text');
+        if (questionTextEl) questionTextEl.innerText = "Loading quiz questions...";
+
+        fetch('/api/quiz/generate_session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                difficulty: activeDifficulty, 
+                topic: activeTopic,
+                language: currentLang  // <-- Pass the language here!
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success && data.questions && data.questions.length > 0) {
+                currentSessionId = data.session_id;
+                questionsData = data.questions; 
+                totalQuestions = questionsData.length;
+                currentStep = 1;
+                renderCurrentQuestion();
+            } else {
+                if (questionTextEl) questionTextEl.innerText = "Failed to load questions. The AI model is currently busy. Please try again.";
+                console.error("Failed to load quiz session:", data.error || "No questions returned");
+            }
+        })
+        .catch(err => {
+            console.error("Error initializing session:", err);
+            if (questionTextEl) questionTextEl.innerText = "Network or server error. Please check your terminal and try again.";
+        });
+    }
+
+    function renderCurrentQuestion() {
+        if (questionsData.length === 0) return;
+        const qData = questionsData[currentStep - 1];
+
+        document.getElementById('question-text').innerText = `Q${currentStep}: ${qData.question_text}`;
+        
+        const progressTextEl = document.getElementById('progress-text');
+        if (progressTextEl) progressTextEl.innerText = `Question ${currentStep} of ${totalQuestions}`;
+        
+        const questionCounterEl = document.getElementById('question-counter');
+        if (questionCounterEl) questionCounterEl.innerText = `Question ${currentStep} of ${totalQuestions}`;
+
+        const pct = Math.round((currentStep / totalQuestions) * 100);
+        const progressPercentEl = document.getElementById('progress-percent');
+        const progressBarEl = document.getElementById('progress-bar');
+        
+        if (progressPercentEl) progressPercentEl.innerText = `${pct}% Complete`;
+        if (progressBarEl) progressBarEl.style.width = `${pct}%`;
+
+        const optContainer = document.getElementById('options-container');
+        if (!optContainer) return;
+        optContainer.innerHTML = '';
+        
+        const optionsMap = { A: qData.option_a, B: qData.option_b, C: qData.option_c, D: qData.option_d };
+        for (const [k, v] of Object.entries(optionsMap)) {
+            if (!v) continue;
+            optContainer.innerHTML += `
+                <button onclick="selectOption('${k}', this)" class="option-btn w-full text-left px-4 py-3 rounded-xl text-xs font-medium text-gray-200 flex items-center justify-between border border-gray-800 bg-gray-900/40 hover:bg-gray-800/60 transition-all">
+                    <div class="flex items-center gap-3">
+                        <div class="w-5 h-5 rounded-full border border-gray-600 flex items-center justify-center text-[10px] text-gray-400 radio-indicator">${k}</div>
+                        <span>${v}</span>
+                    </div>
+                </button>
+            `;
+        }
+
+        selectedOption = null;
+        const explanationBox = document.getElementById('explanation-box');
+        if (explanationBox) explanationBox.classList.add('hidden');
+        
+        const nextBtn = document.getElementById('next-btn');
+        if (nextBtn) nextBtn.classList.add('hidden');
+        
+        const submitBtn = document.getElementById('submit-btn');
+        if (submitBtn) {
+            submitBtn.classList.remove('hidden');
+            submitBtn.disabled = true;
+            submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        }
+    }
+
+    function selectOption(key, btn) {
+        document.querySelectorAll('.option-btn').forEach(b => {
+            b.classList.remove('selected');
+            const ind = b.querySelector('.radio-indicator');
+            if (ind) {
+                ind.style.borderColor = "#4b5563";
+                ind.style.color = "#9ca3af";
+                ind.style.background = "transparent";
+            }
+        });
+        
+        btn.classList.add('selected');
+        const indicator = btn.querySelector('.radio-indicator');
+        if (indicator) {
+            indicator.style.borderColor = "#3b82f6";
+            indicator.style.color = "#ffffff";
+            indicator.style.background = "#3b82f6";
+        }
+        
+        selectedOption = key;
+
+        const submitBtn = document.getElementById('submit-btn');
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+    }
+
+    function submitAnswer() {
+        if (!selectedOption) return;
+
+        const qData = questionsData[currentStep - 1];
+        const isCorrect = (selectedOption === qData.correct_option);
+        if (isCorrect) correctAnswersCount++;
+
+        fetch('/api/quiz/submit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                session_id: currentSessionId,
+                quiz_id: qData.quiz_id,
+                answer: selectedOption,
+                is_correct: isCorrect
+            })
+        }).catch(err => console.error("Error saving answer:", err));
+
+        document.querySelectorAll('.option-btn').forEach(btn => {
+            const ind = btn.querySelector('.radio-indicator');
+            if (!ind) return;
+            const textKey = ind.innerText.trim();
+
+            if (textKey === qData.correct_option) {
+                btn.classList.add('correct');
+                ind.style.borderColor = "#10b981";
+                ind.style.background = "#10b981";
+                ind.style.color = "#ffffff";
+            }
+            if (textKey === selectedOption && selectedOption !== qData.correct_option) {
+                btn.classList.add('wrong');
+                ind.style.borderColor = "#ef4444";
+                ind.style.background = "#ef4444";
+                ind.style.color = "#ffffff";
+            }
+            btn.onclick = null; 
+        });
+
+        const explanationText = document.getElementById('explanation-text');
+        if (explanationText) {
+            explanationText.innerText = qData.explanation || "No explanation provided.";
+        }
+        
+        const explanationBox = document.getElementById('explanation-box');
+        if (explanationBox) explanationBox.classList.remove('hidden');
+        
+        const submitBtn = document.getElementById('submit-btn');
+        if (submitBtn) submitBtn.classList.add('hidden');
+        
+        const nextBtn = document.getElementById('next-btn');
+        if (nextBtn) nextBtn.classList.remove('hidden');
+    }
+
+    function nextQuestion() {
+        currentStep++;
+        if (currentStep > totalQuestions) {
+            document.getElementById('quiz-view').classList.add('hidden');
+            document.getElementById('results-view').classList.remove('hidden');
+            
+            fetch(`/api/quiz/session_results?session_id=${currentSessionId}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        const pct = data.score_percentage;
+
+                        document.getElementById('score-fraction').innerText = `${data.correct_count} / ${data.total_questions}`;
+                        document.getElementById('score-percentage').innerText = `${pct}%`;
+                        
+                        let scoreTitle = "Keep Going!";
+                        let scoreSubtitle = "Good effort, review the explanations to improve.";
+                        if (pct === 100) {
+                            scoreTitle = "Outstanding!";
+                            scoreSubtitle = "Perfect score! You've mastered this topic.";
+                        } else if (pct >= 80) {
+                            scoreTitle = "Great Job!";
+                            scoreSubtitle = "Strong security knowledge demonstrated.";
+                        } else if (pct >= 60) {
+                            scoreTitle = "Good Effort!";
+                            scoreSubtitle = "Passed, but room to strengthen fundamentals.";
+                        }
+                        
+                        document.getElementById('score-title').innerText = scoreTitle;
+                        document.getElementById('score-subtitle').innerText = scoreSubtitle;
+
+                        updateAchievement('achievement-phishing', pct >= 60);
+                        updateAchievement('achievement-guardian', pct >= 80);
+                        updateAchievement('achievement-expert', pct === 100);
+
+                        const recContainer = document.getElementById('recommendations-container');
+                        if (recContainer) {
+                            if (pct < 60) {
+                                recContainer.innerHTML = `
+                                    <div class="p-3 rounded-xl bg-gray-900/60 border border-gray-800 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span> Review core concepts and fundamentals.</div>
+                                    <div class="p-3 rounded-xl bg-gray-900/60 border border-gray-800 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span> Retake the easy-level quiz to build a stronger foundation.</div>`;
+                            } else if (pct < 100) {
+                                recContainer.innerHTML = `
+                                    <div class="p-3 rounded-xl bg-gray-900/60 border border-gray-800 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span> Focus on advanced threat vectors and mitigation strategies.</div>
+                                    <div class="p-3 rounded-xl bg-gray-900/60 border border-gray-800 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span> Try testing your skills on higher difficulty settings.</div>`;
+                            } else {
+                                recContainer.innerHTML = `
+                                    <div class="p-3 rounded-xl bg-gray-900/60 border border-gray-800 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span> You are ready for expert-level modules.</div>`;
+                            }
+                        }
+
+                        const reviewContainer = document.getElementById('dynamic-review-container');
+                        reviewContainer.innerHTML = '';
+                        
+                        data.results.forEach((item, index) => {
+                            const statusColor = item.is_correct ? 'text-green-400 border-green-500/30 bg-green-950/20' : 'text-red-400 border-red-500/30 bg-red-950/20';
+                            const statusText = item.is_correct ? 'Correct' : 'Incorrect';
+                            
+                            reviewContainer.innerHTML += `
+                                <div class="p-3 rounded-xl border ${statusColor} space-y-1">
+                                    <div class="flex justify-between font-semibold">
+                                        <span>Q${index + 1}: ${item.question}</span>
+                                        <span>${statusText}</span>
+                                    </div>
+                                    <p class="text-gray-400 text-[11px]">Your answer: <strong>${item.user_chosen_option || 'None'}</strong> | Correct answer: <strong>${item.correct_option}</strong></p>
+                                </div>
+                            `;
+                        });
+                    }
+                })
+                .catch(err => console.error("Error loading results breakdown:", err));
+
+            return;
+        }
+        renderCurrentQuestion();
+    }
+
+    function updateAchievement(elementId, isUnlocked) {
+        const el = document.getElementById(elementId);
+        if (!el) return;
+        if (isUnlocked) {
+            el.classList.remove('opacity-60', 'bg-gray-900/50', 'border-gray-800');
+            el.classList.add('bg-gradient-to-r', 'from-emerald-950/60', 'border-emerald-500/30');
+            const icon = el.querySelector('i:last-child');
+            if(icon) {
+                icon.className = "fas fa-check-circle text-green-400 text-sm";
+            }
+        }
+    }
+</script>
+</body>
+</html>

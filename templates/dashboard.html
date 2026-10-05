@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="{{ current_lang }}" dir="{{ TRANSLATIONS[current_lang].get('dir', 'ltr') }}">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ TRANSLATIONS[current_lang].get('dash_title', 'Learning Dashboard - CyberLearn') }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#0b1329] text-white min-h-screen font-sans">
+
+    <!-- Top Navigation Bar -->
+    <header class="w-full bg-[#1e3a8a] border-b border-white/10 py-3.5 z-30 shadow-md">
+        <div class="max-w-7xl mx-auto px-8 flex items-center justify-between">
+            <!-- Logo + Name -->
+            <a href="/" class="flex items-center gap-2 text-white font-medium text-sm hover:opacity-90 transition">
+                <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                </svg>
+                <span class="tracking-wide">CyberLearn</span>
+            </a>
+
+            <!-- Globe Icon & Language Selector -->
+            <div class="relative flex items-center">
+                <svg class="w-4 h-4 text-white/80 absolute {% if current_lang == 'ar' %}right-2.5{% else %}left-2.5{% endif %} pointer-events-none z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 002 2h1.5A2.5 2.5 0 0020.5 9.5V7a2 2 0 00-2-2h-1.5A2.5 2.5 0 0112 2.5v-.565M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                
+                <select onchange="window.location.href = this.value;" class="bg-blue-900/60 border border-white/20 text-white text-xs rounded-lg {% if current_lang == 'ar' %}pr-8 pl-7{% else %}pl-8 pr-7{% endif %} py-1.5 focus:outline-none cursor-pointer appearance-none hover:bg-blue-900 transition">
+                    <option value="/set_language/en" class="bg-[#1e3a8a] text-white" {% if current_lang == 'en' or not current_lang %}selected{% endif %}>English</option>
+                    <option value="/set_language/fr" class="bg-[#1e3a8a] text-white" {% if current_lang == 'fr' %}selected{% endif %}>Français</option>
+                    <option value="/set_language/ar" class="bg-[#1e3a8a] text-white" {% if current_lang == 'ar' %}selected{% endif %}>العربية</option>
+                </select>
+
+                <svg class="w-3 h-3 text-white/70 absolute {% if current_lang == 'ar' %}left-2{% else %}right-2{% endif %} pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+            </div>
+        </div>
+    </header>
+
+    <!-- SECONDARY SUB-HEADER BAR -->
+    <div class="w-full bg-[#0b1329] border-b border-blue-900/40 py-4 px-8 mb-8 shadow-inner">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            
+            <!-- Left Side: Back Button + Divider + Icon & Title -->
+            <div class="flex items-center gap-5">
+                <a href="{{ url_for('index') }}" class="text-xs text-white/70 hover:text-white transition flex items-center gap-1.5 bg-blue-950/40 hover:bg-blue-900/60 border border-blue-900/50 px-3 py-1.5 rounded-lg">
+                    <span>{% if current_lang == 'ar' %}→{% else %}←{% endif %}</span>
+                    <span>{{ TRANSLATIONS[current_lang].get('back', 'Back') }}</span>
+                </a>
+
+                <div class="h-6 w-[1px] bg-white/10 hidden sm:block"></div>
+
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 to-indigo-500 flex items-center justify-center shadow-md">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-bold text-white tracking-wide">{{ TRANSLATIONS[current_lang].get('dash_heading', 'Learning Dashboard') }}</h1>
+                        <p class="text-xs text-blue-300/80">{{ TRANSLATIONS[current_lang].get('dash_subheading', 'Track your cybersecurity learning progress') }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side: Settings Button -->
+            <div>
+                <a href="{{ url_for('settings') }}" class="text-xs text-white/85 hover:text-white bg-blue-950/60 hover:bg-blue-900/80 border border-blue-800/50 px-3.5 py-2 rounded-lg transition flex items-center gap-2 shadow-sm cursor-pointer">
+                    <svg class="text-blue-400 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    <span>{{ TRANSLATIONS[current_lang].get('settings', 'Settings') }}</span>
+                </a>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="max-w-7xl mx-auto px-8 space-y-6 pb-12">
+
+        <!-- Top Overview Card -->
+        <div class="bg-[#131e38] border border-blue-900/50 p-6 rounded-2xl shadow-xl space-y-6 text-center">
+            <div class="text-xs text-blue-400 font-semibold tracking-wider uppercase">{{ TRANSLATIONS[current_lang].get('dash_awareness_level', 'Cybersecurity Awareness Level') }}</div>
+            
+            <div class="flex justify-center items-center">
+                <div class="w-28 h-28 rounded-full border-4 border-cyan-400 flex flex-col items-center justify-center bg-blue-950/40 shadow-inner">
+                    <span class="text-2xl font-bold text-white">{{ user.overall_level }}%</span>
+                    <span class="text-[10px] text-white/60">{{ TRANSLATIONS[current_lang].get('dash_learning_level', 'Learning Level') }}</span>
+                </div>
+            </div>
+
+            <!-- Stats Bar Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-blue-900/40">
+                <div class="bg-blue-950/30 p-3 rounded-xl border border-blue-900/30">
+                    <div class="text-orange-400 text-sm font-bold">🔥 {{ user.day_streak }}</div>
+                    <div class="text-[11px] text-white/50">{{ TRANSLATIONS[current_lang].get('dash_day_streak', 'Day Streak') }}</div>
+                </div>
+                <div class="bg-blue-950/30 p-3 rounded-xl border border-blue-900/30">
+                    <div class="text-emerald-400 text-sm font-bold">🎯 {{ user.quizzes_done }}</div>
+                    <div class="text-[11px] text-white/50">{{ TRANSLATIONS[current_lang].get('dash_quizzes_done', 'Quizzes Done') }}</div>
+                </div>
+                <div class="bg-blue-950/30 p-3 rounded-xl border border-blue-900/30">
+                    <div class="text-cyan-400 text-sm font-bold">🏆 {{ user.topics_mastered }}</div>
+                    <div class="text-[11px] text-white/50">{{ TRANSLATIONS[current_lang].get('dash_topics_mastered', 'Topics Mastered') }}</div>
+                </div>
+                <div class="bg-blue-950/30 p-3 rounded-xl border border-blue-900/30">
+                    <div class="text-blue-300 text-sm font-bold">📖 {{ user.in_progress }}</div>
+                    <div class="text-[11px] text-white/50">{{ TRANSLATIONS[current_lang].get('dash_in_progress', 'In Progress') }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Learning Progress by Topic -->
+        <div class="bg-[#131e38] border border-blue-900/50 p-6 rounded-2xl shadow-xl space-y-4">
+            <h3 class="text-xs font-semibold uppercase tracking-wider text-blue-400">{{ TRANSLATIONS[current_lang].get('dash_progress_by_topic', 'Learning Progress by Topic') }}</h3>
+            <div class="space-y-4 pt-2">
+                {% for topic in user.topics %}
+                <div class="space-y-1.5">
+                    <div class="flex justify-between text-xs">
+                        <span class="flex items-center gap-2 text-white font-medium">
+                            {{ topic.name }}
+                            {% if topic.status == 'mastered' %}
+                                <span class="bg-emerald-500/20 text-emerald-400 text-[10px] px-2 py-0.5 rounded-full border border-emerald-500/30">{{ TRANSLATIONS[current_lang].get('status_mastered', '✓ Mastered') }}</span>
+                            {% elif topic.status == 'needs_practice' %}
+                                <span class="bg-amber-500/20 text-amber-400 text-[10px] px-2 py-0.5 rounded-full border border-amber-500/30">{{ TRANSLATIONS[current_lang].get('status_needs_practice', '⚠ Needs Practice') }}</span>
+                            {% elif topic.status == 'not_started' %}
+                                <span class="bg-rose-500/20 text-rose-400 text-[10px] px-2 py-0.5 rounded-full border border-rose-500/30">{{ TRANSLATIONS[current_lang].get('status_not_started', '○ Not Started') }}</span>
+                            {% endif %}
+                        </span>
+                        <span class="text-white/70 font-bold">{{ topic.progress }}%</span>
+                    </div>
+                    <div class="w-full bg-blue-950 h-2 rounded-full overflow-hidden border border-blue-900/40">
+                        <div class="bg-gradient-to-r from-blue-500 to-cyan-400 h-full rounded-full transition-all duration-500" style="width: {{ topic.progress }}%;"></div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Lower Split Grid (Recent Activities & Quiz History) -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            <!-- RECENT ACTIVITIES SECTION -->
+            <div class="bg-blue-950/40 border border-white/10 rounded-2xl p-6">
+                <h3 class="text-xs font-bold text-blue-300 uppercase tracking-wider mb-4">{{ TRANSLATIONS[current_lang].get('dash_recent_activities', 'Recent Activities') }}</h3>
+                <div class="space-y-3">
+                    {% if recent_activities %}
+                        {% for act in recent_activities %}
+                        <div class="flex items-center justify-between bg-blue-900/20 border border-blue-800/40 p-4 rounded-xl">
+                            <div>
+                                <h4 class="text-sm font-semibold text-white">{{ act.title }}</h4>
+                                <p class="text-xs text-blue-300/70">{{ act.subtitle }}</p>
+                                <p class="text-[10px] text-blue-400/50 mt-1">{{ act.timestamp.strftime('%Y-%m-%d %H:%M') if act.timestamp else TRANSLATIONS[current_lang].get('recent', 'Recently') }}</p>
+                            </div>
+                            <span class="px-3 py-1 text-[10px] font-semibold rounded-lg bg-blue-950/60 border border-blue-500/40 text-blue-300">
+                                {{ act.badge }}
+                            </span>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-6 text-blue-300/60 text-xs">
+                            {{ TRANSLATIONS[current_lang].get('dash_no_activity', 'No recent activity yet. Complete a quiz or chat with the assistant to see your history here!') }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- QUIZ HISTORY SECTION -->
+            <div class="bg-blue-950/40 border border-white/10 rounded-2xl p-6">
+                <h3 class="text-xs font-bold text-blue-300 uppercase tracking-wider mb-4">{{ TRANSLATIONS[current_lang].get('dash_quiz_history', 'Quiz History') }}</h3>
+                <div class="space-y-3">
+                    {% if quiz_history %}
+                        {% for activity in quiz_history %}
+                        <div class="flex items-center justify-between bg-blue-900/20 border border-blue-800/40 p-4 rounded-xl">
+                            <div>
+                                <h4 class="text-sm font-semibold text-white">{{ activity.topic }}</h4>
+                                <p class="text-xs text-blue-300/70">{{ activity.timestamp.strftime('%Y-%m-%d') if activity.timestamp else TRANSLATIONS[current_lang].get('recent', 'Recent') }}</p>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-xs font-bold text-blue-300">{{ activity.correct }}/{{ activity.total }}</span>
+                                <div class="text-xs font-semibold {% if activity.score_percentage >= 80 %}text-emerald-400{% else %}text-amber-400{% endif %}">
+                                    {{ activity.score_percentage }}%
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-6 text-blue-300/60 text-xs">
+                            {{ TRANSLATIONS[current_lang].get('dash_no_history', 'No quiz history recorded yet.') }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+        </div>
+
+        <!-- CYBERSECURITY TIPS SECTION -->
+        <div class="bg-blue-950/40 border border-white/10 rounded-2xl p-6">
+            <h3 class="text-xs font-bold text-blue-300 uppercase tracking-wider mb-4">{{ TRANSLATIONS[current_lang].get('dash_cybersecurity_tips', 'Cybersecurity Tips') }}</h3>
+            <div class="space-y-3">
+                {% if tips %}
+                    {% for tip in tips %}
+                    <div class="bg-blue-900/20 border border-blue-800/40 p-4 rounded-xl">
+                        <div class="space-y-1">
+                            <div class="flex items-center gap-2">
+                                <h4 class="text-sm font-semibold text-white">{{ tip.title }}</h4>
+                                <span class="bg-cyan-500/20 text-cyan-400 text-[9px] px-2 py-0.5 rounded-full border border-cyan-500/30">Tip #{{ tip.id }}</span>
+                            </div>
+                            <p class="text-xs text-blue-300/70">{{ tip.content }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center py-6 text-blue-300/60 text-xs">
+                        {{ TRANSLATIONS[current_lang].get('dash_no_tips', 'No security tips available.') }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+    </main>
+</body>
+</html>

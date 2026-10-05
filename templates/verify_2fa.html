@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="min-h-[80vh] flex items-center justify-center px-4">
+    <div class="w-full max-w-md bg-blue-950/40 border border-white/10 rounded-2xl p-8 backdrop-blur-sm shadow-xl">
+        
+        <div class="text-center mb-6">
+            <h2 class="text-lg font-bold text-white mb-1">Two-Factor Authentication</h2>
+            <p class="text-xs text-blue-300/80">Enter the 6-digit verification code sent to your account.</p>
+        </div>
+
+        <!-- Flash Messages Auto-Fade -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div id="2fa-flash" class="space-y-2 mb-6">
+                    {% for category, message in messages %}
+                        <div class="p-3 rounded-xl text-xs flex items-center justify-between shadow-sm {% if category == 'danger' %}bg-red-950/50 border border-red-500/40 text-red-300{% else %}bg-emerald-950/50 border border-emerald-500/40 text-emerald-300{% endif %}">
+                            <span>{{ message }}</span>
+                            <button onclick="this.parentElement.remove()" class="text-current font-bold px-1">&times;</button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <form action="{{ url_for('verify_2fa') }}" method="POST" class="space-y-5">
+            <div>
+                <label class="block text-xs font-semibold text-blue-200 mb-1.5 text-center">Verification Code</label>
+                <input type="text" name="code" required maxlength="6" placeholder="123456" 
+                    class="w-full bg-blue-900/30 border border-blue-800/60 rounded-xl px-4 py-3 text-center text-lg tracking-widest text-white placeholder-white/30 focus:outline-none focus:border-cyan-400 transition">
+            </div>
+
+            <div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold py-3 rounded-xl transition shadow-md">
+                    Verify Code
+                </button>
+            </div>
+        </form>
+
+        <div class="text-center mt-6">
+            <a href="{{ url_for('login') }}" class="text-xs text-blue-300 hover:text-white transition">Back to Login</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

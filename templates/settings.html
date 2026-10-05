@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<!-- MAIN SETTINGS CONTENT CONTAINER -->
+<div class="w-full max-w-4xl mx-auto px-8 pb-12">
+    
+    <!-- Navigation Tabs -->
+    <div class="flex items-center justify-center gap-2 bg-blue-950/50 p-1.5 rounded-xl border border-blue-900/50 mb-8 max-w-sm mx-auto">
+        <a href="{{ url_for('settings') }}" class="flex-1 py-2 px-6 rounded-lg text-xs font-semibold text-white bg-blue-600 shadow-md text-center transition">
+            {{ t.get('settings_tab_profile', 'Profile') }}
+        </a>
+        <a href="{{ url_for('security_settings') }}" class="flex-1 py-2 px-6 rounded-lg text-xs font-medium text-blue-300 hover:text-white hover:bg-blue-900/40 text-center transition">
+            {{ t.get('settings_tab_security', 'Security') }}
+        </a>
+    </div>
+
+    <!-- SUCCESS NOTIFICATION LINE -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div id="flash-messages" class="space-y-2 mb-6">
+                    {% for category, message in messages %}
+                        <div class="p-3 rounded-xl bg-emerald-950/50 border border-emerald-500/40 text-emerald-300 text-xs flex items-center justify-between shadow-sm transition-opacity duration-500">
+                            <div class="flex items-center gap-2">
+                                <svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                <span>{{ message }}</span>
+                            </div>
+                            <button onclick="this.parentElement.remove()" class="text-emerald-400 hover:text-white text-base font-bold px-1">&times;</button>
+                        </div>
+                    {% endfor %}
+                </div>
+                <script>
+                    setTimeout(function() {
+                        const flashBox = document.getElementById('flash-messages');
+                        if (flashBox) {
+                            flashBox.style.opacity = '0';
+                            setTimeout(() => flashBox.remove(), 500);
+                        }
+                    }, 4000);
+                </script>
+            {% endif %}
+        {% endwith %}
+
+    <!-- Profile Information Card -->
+    <div class="bg-blue-950/40 border border-white/10 rounded-2xl p-8 backdrop-blur-sm shadow-xl">
+        <div class="mb-6 pb-4 border-b border-blue-900/40">
+            <h2 class="text-sm font-bold text-white mb-1">{{ t.get('profile_info_title', 'Profile Information') }}</h2>
+            <p class="text-xs text-blue-300/80">{{ t.get('profile_info_desc', 'Update your personal details below') }}</p>
+        </div>
+
+        <form action="{{ url_for('settings') }}" method="POST" class="space-y-5">
+            <div>
+                <label class="block text-xs font-semibold text-blue-200 mb-1.5">{{ t.get('profile_fullname', 'Full Name') }}</label>
+                <input type="text" name="name" value="{{ user.name }}" class="w-full bg-blue-900/30 border border-blue-800/60 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-400 transition" required>
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold text-blue-200 mb-1.5">{{ t.get('profile_email', 'Email Address') }}</label>
+                <input type="email" name="email" value="{{ user.email }}" class="w-full bg-blue-900/30 border border-blue-800/60 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-400 transition" required>
+            </div>
+
+            <div class="pt-4">
+                <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-5 py-2.5 rounded-xl transition shadow-md">
+                    {{ t.get('profile_save_btn', 'Save Changes') }}
+                </button>
+            </div>
+        </form>
+    </div>
+
+</div>
+{% endblock %}

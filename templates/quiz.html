@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en" {% if current_lang == 'ar' %}dir="rtl"{% endif %}>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        {% if current_lang == 'fr' %}CyberLearn - Choisir le sujet du quiz
+        {% elif current_lang == 'ar' %}CyberLearn - اختر موضوع الاختبار
+        {% else %}CyberLearn - Select Quiz Topic{% endif %}
+    </title>
+    <!-- Include your CSS / Tailwind / FontAwesome here -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { background-color: #0b1329; color: #ffffff; font-family: 'Inter', sans-serif; }
+        .topic-card { background-color: #0f172a; border: 1px solid #1e293b; transition: all 0.3s ease; }
+        .topic-card:hover { border-color: #3b82f6; transform: translateY(-3px); }
+        .modal-bg { background-color: rgba(3, 7, 18, 0.8); backdrop-filter: blur(4px); }
+        .level-option { background-color: #1e293b; border: 1px solid #334155; transition: all 0.2s ease; }
+        .level-option:hover, .level-option.selected { border-color: #3b82f6; background-color: #1e293b; box-shadow: 0 0 15px rgba(59, 130, 246, 0.2); }
+        .level-option.selected {
+            border-color: #3b82f6 !important;
+            background-color: #172554 !important;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-6">
+
+    <!-- Fixed Top Navigation & Back Header -->
+    <div class="w-full fixed top-0 left-0 right-0 z-40 shadow-lg">
+        <!-- Top Navigation Bar -->
+        <header class="w-full py-3.5" style="background-color: #1e3a8a; border-bottom: 1px solid #1e293b;">
+            <div class="max-w-7xl mx-auto px-8 flex items-center justify-between">
+                <!-- Logo + Name -->
+                <a href="/" class="flex items-center gap-2 text-white font-medium text-sm hover:opacity-90 transition">
+                    <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                    </svg>
+                    <span class="tracking-wide">CyberLearn</span>
+                </a>
+
+                <!-- Globe Icon & Language Selector -->
+                <div class="relative flex items-center">
+                    <svg class="w-4 h-4 text-white/80 absolute {% if current_lang == 'ar' %}right-2.5{% else %}left-2.5{% endif %} pointer-events-none z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 002 2h1.5a2.5 2.5 0 002.5-2.5V7a2 2 0 00-2-2h-1.5A2.5 2.5 0 0112 2.5v-.565M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    
+                    <select onchange="window.location.href = this.value;" class="text-white text-xs rounded-lg {% if current_lang == 'ar' %}pl-7 pr-8{% else %}pl-8 pr-7{% endif %} py-1.5 focus:outline-none cursor-pointer appearance-none transition" style="background-color: #1e3a8a; border: 1px solid #1e293b;">
+                        <option value="/set_language/en" class="bg-[#1e3a8a] text-white" {% if current_lang == 'en' or not current_lang %}selected{% endif %}>English</option>
+                        <option value="/set_language/fr" class="bg-[#1e3a8a] text-white" {% if current_lang == 'fr' %}selected{% endif %}>Français</option>
+                        <option value="/set_language/ar" class="bg-[#1e3a8a] text-white" {% if current_lang == 'ar' %}selected{% endif %}>العربية</option>
+                    </select>
+
+                    <svg class="w-3 h-3 text-white/70 absolute {% if current_lang == 'ar' %}left-2{% else %}right-2{% endif %} pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </div>
+            </div>
+        </header>
+
+        <!-- Secondary Sub-Header Bar with Back Button -->
+        <div class="w-full py-2.5" style="background-color: #111c44; border-bottom: 1px solid #1e293b;">
+            <div class="max-w-7xl mx-auto px-8 flex items-center">
+                <a href="{{ url_for('index') }}" class="inline-flex items-center gap-2 text-gray-300 hover:text-white text-xs font-medium transition">
+                    <svg class="w-3.5 h-3.5 {% if current_lang == 'ar' %}rotate-180{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                    {% if current_lang == 'fr' %}Retour
+                    {% elif current_lang == 'ar' %}رجوع
+                    {% else %}Back{% endif %}
+                </a>
+            </div>
+        </div>
+    </div>
+
+<div class="pt-28">   
+    <!-- Quiz Header Title Section -->
+    <div class="text-center max-w-xl mx-auto mb-10 mt-2">
+        <div class="inline-block bg-blue-950 text-blue-400 text-xs px-3 py-1 rounded-full mb-3 border border-blue-800">
+            <i class="fa-solid fa-graduation-cap mr-1"></i> 
+            {% if current_lang == 'fr' %}Quiz sur la cybersécurité
+            {% elif current_lang == 'ar' %}اختبار الأمن السيبراني
+            {% else %}Cybersecurity Quiz{% endif %}
+        </div>
+        <h1 class="text-3xl font-bold mb-2">
+            {% if current_lang == 'fr' %}Choisir le sujet du quiz
+            {% elif current_lang == 'ar' %}اختر موضوع الاختبار
+            {% else %}Select Quiz Topic{% endif %}
+        </h1>
+        <p class="text-gray-400 text-sm">
+            {% if current_lang == 'fr' %}Choisissez un domaine d'apprentissage pour tester vos connaissances et suivre vos progrès
+            {% elif current_lang == 'ar' %}اختر مجالاً تعليمياً تختبر به معرفتك وتتابع تقدمك
+            {% else %}Choose a learning domain to test your knowledge and track your progress{% endif %}
+        </p>
+    </div>
+
+    <!-- Quiz Topics Grid Container -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto px-6 mb-16">
+    
+    {# Fallback to standard topics if topics_list is not passed by this specific route #}
+    {% set display_topics = topics_list if topics_list is defined and topics_list else [
+        {'name': 'Password Safety', 'progress': 0, 'status': 'not_started'},
+        {'name': 'Phishing Awareness', 'progress': 0, 'status': 'not_started'},
+        {'name': 'Online Privacy', 'progress': 0, 'status': 'not_started'},
+        {'name': 'Social Engineering', 'progress': 0, 'status': 'not_started'},
+        {'name': 'Safe Browsing', 'progress': 0, 'status': 'not_started'}
+    ] %}
+
+    {% for t in display_topics %}
+    
+    {% set t_name = t.name %}
+    {% set t_slug = t_name | lower | replace(' ', '-') %}
+    {% set t_progress = t.progress %}
+    {% set t_status = t.status %}
+    
+    <!-- Define Theme Colors & Icons based on topic name -->
+    {% if t_name == 'Password Safety' %}
+        {% set border_color = '#60a5fa' %}
+        {% set glow_bg = 'rgba(96, 165, 250, 0.1)' %}
+        {% set icon_bg = 'linear-gradient(to bottom, #60a5fa, #2563eb)' %}
+        {% set icon_class = 'fa-lock' %}
+        {% set bar_gradient = 'linear-gradient(to right, #38bdf8, #3b82f6)' %}
+        {% set text_color = '#60a5fa' %}
+    {% elif t_name == 'Phishing Awareness' %}
+        {% set border_color = '#34d399' %}
+        {% set glow_bg = 'rgba(52, 211, 153, 0.1)' %}
+        {% set icon_bg = 'linear-gradient(to bottom, #34d399, #16a34a)' %}
+        {% set icon_class = 'fa-envelope' %}
+        {% set bar_gradient = 'linear-gradient(to right, #34d399, #22c55e)' %}
+        {% set text_color = '#34d399' %}
+    {% elif t_name == 'Online Privacy' %}
+        {% set border_color = '#a855f7' %}
+        {% set glow_bg = 'rgba(168, 85, 247, 0.15)' %}
+        {% set icon_bg = 'linear-gradient(to bottom, #c084fc, #7e22ce)' %}
+        {% set icon_class = 'fa-eye' %}
+        {% set bar_gradient = 'linear-gradient(to right, #c084fc, #9333ea)' %}
+        {% set text_color = '#c084fc' %}
+    {% elif t_name == 'Social Engineering' %}
+        {% set border_color = '#f59e0b' %}
+        {% set glow_bg = 'rgba(245, 158, 11, 0.15)' %}
+        {% set icon_bg = 'linear-gradient(to bottom, #fbbf24, #d97706)' %}
+        {% set icon_class = 'fa-user-group' %}
+        {% set bar_gradient = 'linear-gradient(to right, #fbbf24, #d97706)' %}
+        {% set text_color = '#fbbf24' %}
+    {% elif t_name == 'Safe Browsing' %}
+        {% set border_color = '#06b6d4' %}
+        {% set glow_bg = 'rgba(6, 182, 212, 0.15)' %}
+        {% set icon_bg = 'linear-gradient(to bottom, #22d3ee, #0891b2)' %}
+        {% set icon_class = 'fa-globe' %}
+        {% set bar_gradient = 'linear-gradient(to right, #22d3ee, #0891b2)' %}
+        {% set text_color = '#22d3ee' %}
+    {% else %}
+        {% set border_color = '#60a5fa' %}
+        {% set glow_bg = 'rgba(96, 165, 250, 0.1)' %}
+        {% set icon_bg = 'linear-gradient(to bottom, #60a5fa, #2563eb)' %}
+        {% set icon_class = 'fa-shield-halved' %}
+        {% set bar_gradient = 'linear-gradient(to right, #38bdf8, #3b82f6)' %}
+        {% set text_color = '#60a5fa' %}
+    {% endif %}
+
+    <div class="topic-card" style="background-color: #0b1229; border: 1px solid #1b254b; padding: 20px; border-radius: 16px; cursor: pointer; position: relative; overflow: hidden;" onmouseover="this.style.borderColor='{{ border_color }}'; this.querySelector('.glow-effect').style.opacity='1'; this.querySelector('.start-quiz').style.opacity='1';" onmouseout="this.style.borderColor='#1b254b'; this.querySelector('.glow-effect').style.opacity='0'; this.querySelector('.start-quiz').style.opacity='0';" onclick="openLevelModal('{{ t_slug }}', '{{ t_name }}')">
+        
+        <!-- Hover Glow Effect -->
+        <div class="glow-effect" style="position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 128px; height: 64px; background: {{ glow_bg }}; filter: blur(24px); border-radius: 9999px; opacity: 0; transition: opacity 0.5s ease; pointer-events: none;"></div>
+
+        <!-- Top Row: Icon -->
+        <div style="margin-bottom: 16px; position: relative; z-index: 10;">
+            <div style="width: 36px; height: 36px; border-radius: 12px; background: {{ icon_bg }}; display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+                <i class="fa-solid {{ icon_class }}" style="font-size: 14px;"></i>
+            </div>
+        </div>
+
+        <!-- Title Row with Dynamic Status Badge -->
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px; position: relative; z-index: 10;">
+            <h3 style="font-weight: bold; color: white; letter-spacing: 0.025em; font-size: 14px; margin: 0;">
+                {% if current_lang == 'fr' %}
+                    {% if t_name == 'Password Safety' %}Sécurité des mots de passe
+                    {% elif t_name == 'Phishing Awareness' %}Sensibilisation au hameçonnage
+                    {% elif t_name == 'Online Privacy' %}Confidentialité en ligne
+                    {% elif t_name == 'Social Engineering' %}Ingénierie sociale
+                    {% elif t_name == 'Safe Browsing' %}Navigation sécurisée
+                    {% else %}{{ t_name }}{% endif %}
+                {% elif current_lang == 'ar' %}
+                    {% if t_name == 'Password Safety' %}أمان كلمات المرور
+                    {% elif t_name == 'Phishing Awareness' %}التوعية بالاحتيال الإلكتروني
+                    {% elif t_name == 'Online Privacy' %}الخصوصية عبر الإنترنت
+                    {% elif t_name == 'Social Engineering' %}الهندسة الاجتماعية
+                    {% elif t_name == 'Safe Browsing' %}التصفح الآمن
+                    {% else %}{{ t_name }}{% endif %}
+                {% else %}
+                    {{ t_name }}
+                {% endif %}
+            </h3>
+            
+            {% if t_status == 'mastered' %}
+                <span style="background-color: #10231c; color: #34d399; padding: 2px 10px; border-radius: 9999px; border: 1px solid rgba(16, 185, 129, 0.3); display: flex; align-items: center; gap: 4px; flex-shrink: 0; font-size: 10px;">
+                    <i class="fa-solid fa-circle-check" style="font-size: 8px;"></i>
+                    <span>
+                        {% if current_lang == 'fr' %}Maîtrisé
+                        {% elif current_lang == 'ar' %}متقن
+                        {% else %}Mastered{% endif %}
+                    </span>
+                </span>
+
+            {% elif t_status == 'needs_practice' %}
+                <span style="background-color: #26190b; color: #fbbf24; padding: 2px 10px; border-radius: 9999px; border: 1px solid rgba(245, 158, 11, 0.3); display: flex; align-items: center; gap: 4px; flex-shrink: 0; font-size: 10px;">
+                    <i class="fa-solid fa-triangle-exclamation" style="font-size: 8px;"></i>
+                    <span>
+                        {% if current_lang == 'fr' %}À améliorer
+                        {% elif current_lang == 'ar' %}بحاجة لتدريب
+                        {% else %}Needs Practice{% endif %}
+                    </span>
+                </span>
+
+            {% else %}
+                <span style="background-color: #2a1215; color: #f87171; padding: 2px 10px; border-radius: 9999px; border: 1px solid rgba(248, 113, 113, 0.3); display: flex; align-items: center; gap: 4px; flex-shrink: 0; font-size: 10px;">
+                    <i class="fa-solid fa-circle-dot" style="font-size: 8px;"></i>
+                    <span>
+                        {% if current_lang == 'fr' %}Non commencé
+                        {% elif current_lang == 'ar' %}لم يبدأ
+                        {% else %}Not Started{% endif %}
+                    </span>
+                </span>
+
+            {% endif %}
+        </div>
+
+        <!-- Description -->
+        <p style="color: #9ca3af; margin-bottom: 24px; line-height: 1.5; position: relative; z-index: 10; font-size: 11px; margin-top: 0;">
+            {% if current_lang == 'fr' %}
+                {% if t_name == 'Password Safety' %}Apprenez à créer des mots de passe forts et incassables et à gérer vos identifiants en toute sécurité.
+                {% elif t_name == 'Phishing Awareness' %}Identifiez les faux e-mails, les liens suspects et les tentatives de hameçonnage avant qu'il ne soit trop tard.
+                {% elif t_name == 'Online Privacy' %}Contrôlez votre empreinte numérique et protégez vos informations personnelles en ligne.
+                {% elif t_name == 'Social Engineering' %}Reconnaissez les tactiques de manipulation et les astuces psychologiques utilisées par les cybercriminels.
+                {% elif t_name == 'Safe Browsing' %}Naviguez sur le Web en toute sécurité et évitez les sites Web malveillants et les téléchargements dangereux.
+                {% endif %}
+            {% elif current_lang == 'ar' %}
+                {% if t_name == 'Password Safety' %}تعلم كيفية إنشاء كلمات مرور قوية يصعب اختراقها وإدارة بيانات اعتمادك بشكل آمن.
+                {% elif t_name == 'Phishing Awareness' %}تحديد الرسائل المزيفة والروابط المشبوهة ومحاولات التصيد قبل فوات الأوان.
+                {% elif t_name == 'Online Privacy' %}تحكم في بصمتك الرقمية واحمِ معلوماتك الشخصية عبر الإنترنت.
+                {% elif t_name == 'Social Engineering' %}تعرف على تكتيكات التلاعب والخدع النفسية التي يستخدمها مجرمو الإنترنت.
+                {% elif t_name == 'Safe Browsing' %}تصفح الويب بأمان وتجنب المواقع الضارة والتنزيلات الخطيرة.
+                {% endif %}
+            {% else %}
+                {% if t_name == 'Password Safety' %}Learn to create strong, unbreakable passwords and manage your credentials securely.
+                {% elif t_name == 'Phishing Awareness' %}Identify fake emails, suspicious links, and phishing attempts before it's too late.
+                {% elif t_name == 'Online Privacy' %}Control your digital footprint and protect your personal information online.
+                {% elif t_name == 'Social Engineering' %}Recognize manipulation tactics and psychological tricks used by cybercriminals.
+                {% elif t_name == 'Safe Browsing' %}Browse the web safely and avoid malicious websites and dangerous downloads.
+                {% endif %}
+            {% endif %}
+        </p>
+
+        <!-- Progress Section -->
+        <div style="margin-bottom: 8px; position: relative; z-index: 10;">
+            <div style="display: flex; justify-content: space-between; color: #9ca3af; margin-bottom: 4px; font-size: 11px;">
+                <span>
+                    {% if current_lang == 'fr' %}Progrès
+                    {% elif current_lang == 'ar' %}التقدم
+                    {% else %}Progress{% endif %}
+                </span>
+                <span style="color: white; font-weight: 600;">{{ t_progress }}%</span>
+            </div>
+            <div style="width: 100%; background-color: #131b35; height: 6px; border-radius: 9999px; overflow: hidden; border: 1px solid rgba(30, 41, 59, 0.4);">
+                <div style="background: {{ bar_gradient }}; height: 100%; border-radius: 9999px; width: {{ t_progress }}%;"></div>
+            </div>
+        </div>
+
+        <!-- Hover Action Indicator -->
+        <div class="start-quiz" style="padding-top: 8px; display: flex; align-items: center; color: {{ text_color }}; font-weight: 600; opacity: 0; transition: opacity 0.3s ease; position: relative; z-index: 10; font-size: 12px;">
+            <span>
+                {% if current_lang == 'fr' %}Commencer le quiz
+                {% elif current_lang == 'ar' %}ابدأ الاختبار
+                {% else %}Start Quiz{% endif %}
+            </span>
+            <i class="fa-solid fa-chevron-right {% if current_lang == 'ar' %}rotate-180 mr-1 ml-0{% else %}ml-1 mr-0{% endif %}" style="font-size: 10px;"></i>
+        </div>
+    </div>
+    {% endfor %}
+
+</div>
+
+    </div>
+
+    <!-- Knowledge Level Modal Popup -->
+    <div id="levelModal" class="fixed inset-0 modal-bg hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-gray-900 border border-gray-800 rounded-2xl w-full max-w-md p-6 relative shadow-2xl overflow-hidden" style="background-color: #0b1229; border-color: #1b254b;">
+            
+            <!-- Top Glowing Border Line -->
+            <div style="position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(to right, transparent, #3b82f6, transparent); z-index: 10;"></div>
+
+            <!-- Top Light Switch Hover Glow Effect (Behind Top) -->
+            <div style="position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 160px; height: 48px; background: rgba(59, 130, 246, 0.2); filter: blur(20px); border-radius: 9999px; pointer-events: none; z-index: 1;"></div>
+
+            <!-- Modal Header Row -->
+            <div class="flex justify-between items-start mb-6 relative z-10">
+                <div>
+                    <h2 class="text-xl font-bold text-white mb-1" style="font-size: 18px;">
+                        {% if current_lang == 'fr' %}Choisissez votre niveau de connaissance
+                        {% elif current_lang == 'ar' %}اختر مستواك المعرفي
+                        {% else %}Choose Your Knowledge Level{% endif %}
+                    </h2>
+                    <p class="text-gray-400" style="font-size: 12px;">
+                        {% if current_lang == 'fr' %}Sélectionnez la difficulté qui correspond à votre expérience
+                        {% elif current_lang == 'ar' %}حدد مستوى الصعوبة الذي يناسب خبرتك
+                        {% else %}Select the difficulty that matches your experience{% endif %}
+                    </p>
+                </div>
+                <!-- Close button on the right -->
+                <button onclick="closeLevelModal()" class="text-gray-400 hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-base"></i>
+                </button>
+            </div>
+
+            <!-- Difficulty Levels Selection -->
+            <div class="space-y-3 mb-6 relative z-10">
+                
+                <!-- Easy (Green Theme) -->
+                <a href="#" id="link-easy" class="level-option p-4 rounded-xl cursor-pointer flex items-center justify-between transition duration-300 block no-underline" style="background-color: #101833; border: 1px solid #1b254b;" onmouseover="this.style.borderColor='#10b981'; this.querySelector('.icon-box').style.backgroundColor='#065f46'; this.querySelector('.icon-box').style.color='#34d399';" onmouseout="this.style.borderColor='#1b254b'; this.querySelector('.icon-box').style.backgroundColor='#064e3b'; this.querySelector('.icon-box').style.color='#34d399';">
+                    <div class="flex items-center space-x-3 {% if current_lang == 'ar' %}space-x-reverse{% endif %}">
+                        <div class="icon-box w-10 h-10 rounded-xl flex items-center justify-center transition duration-300" style="background-color: #064e3b; color: #34d399;">
+                            <i class="fa-solid fa-bolt text-base"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-sm text-white">
+                                {% if current_lang == 'fr' %}Facile
+                                {% elif current_lang == 'ar' %}سهل
+                                {% else %}Easy{% endif %}
+                            </h4>
+                            <p class="text-gray-400 text-xs">
+                                {% if current_lang == 'fr' %}Parfait pour les débutants — concepts fondamentaux...
+                                {% elif current_lang == 'ar' %}مثالي للمبتدئين — المفاهيم الأساسية...
+                                {% else %}Perfect for beginners — foundational concepts...{% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    <span class="text-xs px-3 py-1.5 rounded-full border border-emerald-800/60 flex-shrink-0" style="background-color: #022c22; color: #34d399;">
+                        {% if current_lang == 'fr' %}Débutant
+                        {% elif current_lang == 'ar' %}مبتدئ
+                        {% else %}Beginner Friendly{% endif %}
+                    </span>
+                </a>
+
+                <!-- Medium (Amber Theme) -->
+                <a href="#" id="link-medium" class="level-option p-4 rounded-xl cursor-pointer flex items-center justify-between transition duration-300 block no-underline" style="background-color: #101833; border: 1px solid #1b254b;" onmouseover="this.style.borderColor='#f59e0b'; this.querySelector('.icon-box').style.backgroundColor='#78350f'; this.querySelector('.icon-box').style.color='#fbbf24';" onmouseout="this.style.borderColor='#1b254b'; this.querySelector('.icon-box').style.backgroundColor='#451a03'; this.querySelector('.icon-box').style.color='#fbbf24';">
+                    <div class="flex items-center space-x-3 {% if current_lang == 'ar' %}space-x-reverse{% endif %}">
+                        <div class="icon-box w-10 h-10 rounded-xl flex items-center justify-center transition duration-300" style="background-color: #451a03; color: #fbbf24;">
+                            <i class="fa-solid fa-star text-base"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-sm text-white">
+                                {% if current_lang == 'fr' %}Moyen
+                                {% elif current_lang == 'ar' %}متوسط
+                                {% else %}Medium{% endif %}
+                            </h4>
+                            <p class="text-gray-400 text-xs">
+                                {% if current_lang == 'fr' %}Pour les apprenants avec des connaissances de base — applications principales...
+                                {% elif current_lang == 'ar' %}للمتعلمين ذوي المعرفة الأساسية — التطبيقات الأساسية...
+                                {% else %}For learners with basic knowledge — core applications...{% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    <span class="text-xs px-3 py-1.5 rounded-full border border-amber-800/60 flex-shrink-0" style="background-color: #451a03; color: #fbbf24;">
+                        {% if current_lang == 'fr' %}Intermédiaire
+                        {% elif current_lang == 'ar' %}متوسط الخبرة
+                        {% else %}Intermediate{% endif %}
+                    </span>
+                </a>
+
+                <!-- Intermediate (Orange Theme) -->
+                <a href="#" id="link-intermediate" class="level-option p-4 rounded-xl cursor-pointer flex items-center justify-between transition duration-300 block no-underline" style="background-color: #101833; border: 1px solid #1b254b;" onmouseover="this.style.borderColor='#f97316'; this.querySelector('.icon-box').style.backgroundColor='#7c2d12'; this.querySelector('.icon-box').style.color='#fb923c';" onmouseout="this.style.borderColor='#1b254b'; this.querySelector('.icon-box').style.backgroundColor='#431407'; this.querySelector('.icon-box').style.color='#fb923c';">
+                    <div class="flex items-center space-x-3 {% if current_lang == 'ar' %}space-x-reverse{% endif %}">
+                        <div class="icon-box w-10 h-10 rounded-xl flex items-center justify-center transition duration-300" style="background-color: #431407; color: #fb923c;">
+                            <i class="fa-solid fa-fire text-base"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-sm text-white">
+                                {% if current_lang == 'fr' %}Intermédiaire supérieur
+                                {% elif current_lang == 'ar' %}متقدم
+                                {% else %}Intermediate{% endif %}
+                            </h4>
+                            <p class="text-gray-400 text-xs">
+                                {% if current_lang == 'fr' %}Concepts plus approfondis — sécurité réseau, authentification...
+                                {% elif current_lang == 'ar' %}مفاهيم أعمق — أامن الشبكات، المصادقة...
+                                {% else %}Deeper concepts — network security, authentication...{% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    <span class="text-xs px-3 py-1.5 rounded-full border border-orange-800/60 flex-shrink-0" style="background-color: #431407; color: #fb923c;">
+                        {% if current_lang == 'fr' %}Avancé
+                        {% elif current_lang == 'ar' %}متقدم
+                        {% else %}Advanced{% endif %}
+                    </span>
+                </a>
+
+                <!-- Hard (Red Theme) -->
+                <a href="#" id="link-hard" class="level-option p-4 rounded-xl cursor-pointer flex items-center justify-between transition duration-300 block no-underline" style="background-color: #101833; border: 1px solid #1b254b;" onmouseover="this.style.borderColor='#ef4444'; this.querySelector('.icon-box').style.backgroundColor='#7f1d1d'; this.querySelector('.icon-box').style.color='#f87171';" onmouseout="this.style.borderColor='#1b254b'; this.querySelector('.icon-box').style.backgroundColor='#450a0a'; this.querySelector('.icon-box').style.color='#f87171';">
+                    <div class="flex items-center space-x-3 {% if current_lang == 'ar' %}space-x-reverse{% endif %}">
+                        <div class="icon-box w-10 h-10 rounded-xl flex items-center justify-center transition duration-300" style="background-color: #450a0a; color: #f87171;">
+                            <i class="fa-solid fa-trophy text-base"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-sm text-white">
+                                {% if current_lang == 'fr' %}Difficile
+                                {% elif current_lang == 'ar' %}صعب
+                                {% else %}Hard{% endif %}
+                            </h4>
+                            <p class="text-gray-400 text-xs">
+                                {% if current_lang == 'fr' %}Niveau expert — attaques sophistiquées, cryptographie...
+                                {% elif current_lang == 'ar' %}مستوى الخبراء — هجمات معقدة، التشفير...
+                                {% else %}Expert level — sophisticated attacks, cryptography...{% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    <span class="text-xs px-3 py-1.5 rounded-full border border-red-800/60 flex-shrink-0" style="background-color: #450a0a; color: #f87171;">
+                        {% if current_lang == 'fr' %}Expert
+                        {% elif current_lang == 'ar' %}خبير
+                        {% else %}Expert{% endif %}
+                    </span>
+                </a>
+
+            <!-- Launch Button & Cancel -->
+            <div class="relative z-10">
+                <button onclick="launchQuiz()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3 rounded-xl transition duration-200 shadow-lg shadow-blue-600/30 mb-3">
+                    {% if current_lang == 'fr' %}Lancer l'évaluation du quiz
+                    {% elif current_lang == 'ar' %}بدء تقييم الاختبار
+                    {% else %}Launch Quiz Assessment{% endif %}
+                </button>
+                <div class="text-center">
+                    <button onclick="closeLevelModal()" class="text-gray-400 hover:text-white text-xs">
+                        {% if current_lang == 'fr' %}Annuler
+                        {% elif current_lang == 'ar' %}إلغاء
+                        {% else %}Cancel{% endif %}
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+    <!-- JavaScript for Modal & Navigation Control -->
+    <script>
+        let selectedTopic = '';
+        let selectedLevel = '';
+        let currentSelectedLevel = null;
+        let selectedDifficulty = 'easy'; // default
+
+        function openLevelModal(topicKey, topicName) {
+            // Store the selected topic name globally so launchQuiz can use it
+            selectedTopic = topicName;
+
+            // 1. Fixed ID name to match your HTML id="levelModal"
+            const modal = document.getElementById('levelModal'); 
+            if (modal) modal.classList.remove('hidden');
+
+            // 2. Dynamically update every difficulty link inside the modal with the chosen topic
+            const difficultyLinks = document.querySelectorAll('.level-option');
+            difficultyLinks.forEach(link => {
+                const urlParams = new URLSearchParams(link.getAttribute('href').split('?')[1]);
+                const difficulty = urlParams.get('difficulty') || 'easy';
+                
+                link.setAttribute('href', `/questions?difficulty=${difficulty}&topic=${encodeURIComponent(topicName)}`);
+            });
+        }
+
+        function closeLevelModal() {
+            document.getElementById('levelModal').classList.add('hidden');
+            selectedLevel = '';
+            currentSelectedLevel = null;
+            document.querySelectorAll('.level-option').forEach(el => el.classList.remove('selected'));
+        }
+
+        function selectLevel(level, element) {
+            selectedLevel = level;        // Store in selectedLevel
+            currentSelectedLevel = level; // Keep both in sync
+            selectedDifficulty = level;   // Updates so launchQuiz passes the correct difficulty!
+            
+            // Remove 'selected' class from all level options
+            const options = document.querySelectorAll('.level-option');
+            options.forEach(opt => opt.classList.remove('selected'));
+            
+            // Add 'selected' class to the clicked one
+            element.classList.add('selected');
+        }
+
+        function launchQuiz() {
+            if (!selectedLevel) {
+                alert('Please select a knowledge level first!');
+                return;
+            }
+            // Pass both the correct topic and the selected difficulty/level to the page
+            window.location.href = `/questions?topic=${encodeURIComponent(selectedTopic)}&difficulty=${encodeURIComponent(selectedDifficulty)}`;
+        }
+    </script>
+</body>
+</html>

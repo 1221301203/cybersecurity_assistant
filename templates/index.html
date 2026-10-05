@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="{{ current_lang if current_lang else 'en' }}" dir="{{ t.get('dir', 'ltr') }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberLearn - Learn Cybersecurity the Smart Way</title>
+    <!-- Google Fonts: Open Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Open Sans', 'Segoe UI', system-ui, -apple-system, sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-800 antialiased">
+
+    <!-- TOP NAVIGATION BAR HEADER -->
+    <header class="w-full bg-[#1b43be] border-b border-blue-700/40 px-8 md:px-16 py-3.5 text-white relative z-50">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            
+            <!-- Logo -->
+            <a href="/" class="flex items-center gap-2 hover:opacity-90 transition">
+                <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                </svg>
+                <span class="font-semibold text-base tracking-tight text-white">{{ t.get('app_title', 'CyberLearn').split(' - ')[0] }}</span>
+            </a>
+
+            <!-- Right Nav Options -->
+            <div class="flex items-center gap-4 text-xs font-normal">
+                
+                <!-- WORKING LANGUAGE SELECTOR DROPDOWN -->
+                <div class="relative inline-block text-left">
+                    <button id="langMenuBtn" type="button" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-blue-900/30 border border-blue-400/30 text-slate-100 hover:bg-blue-800/40 focus:outline-none transition text-xs">
+                        <svg class="w-3.5 h-3.5 text-slate-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path>
+                        </svg>
+                        <span id="selectedLangText">{{ t.get('nav_lang', 'English') }}</span>
+                        <svg class="w-3 h-3 text-slate-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+
+                    <!-- Dropdown Options Menu -->
+                    <div id="langDropdown" class="hidden absolute right-0 mt-2 w-36 rounded-md shadow-lg bg-slate-800 border border-slate-700 ring-1 ring-black ring-opacity-5 divide-y divide-slate-700/50">
+                        <div class="py-1">
+                        <button onclick="selectLanguage('en')" class="w-full text-left px-4 py-2 text-xs text-slate-200 hover:bg-slate-700 transition">
+                            English
+                        </button>
+                        <button onclick="selectLanguage('fr')" class="w-full text-left px-4 py-2 text-xs text-slate-200 hover:bg-slate-700 transition">
+                            Français
+                        </button>
+                        <button onclick="selectLanguage('ar')" class="w-full text-left px-4 py-2 text-xs text-slate-200 hover:bg-slate-700 transition">
+                             العربية
+                        </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Auth Buttons / User State -->
+                {% if current_user.is_authenticated %}
+                    <a href="/dashboard" class="text-slate-200 hover:text-white px-2 py-1 transition">{{ t.get('nav_dashboard', 'Dashboard') }}</a>
+                    <a href="/logout" class="bg-white text-blue-700 font-medium px-3 py-1 rounded-md hover:bg-blue-50 transition shadow-sm">{{ t.get('nav_logout', 'Log Out') }}</a>
+                {% else %}
+                    <a href="/login" class="text-slate-200 hover:text-white px-2 py-1 transition">{{ t.get('nav_login', 'Log In') }}</a>
+                    <a href="/register" class="bg-white text-blue-700 font-medium px-3.5 py-1 rounded-md hover:bg-blue-50 transition shadow-sm">{{ t.get('nav_register', 'Sign Up') }}</a>
+                {% endif %}
+            </div>
+
+        </div>
+    </header>
+
+    <!-- MAIN LANDING CONTENT -->
+    <main class="w-full">
+
+        <!-- 1. HERO SECTION -->
+        <section class="w-full min-h-[30vh] bg-gradient-to-b from-[#1d52ed] via-[#1a4cd2] to-[#163f8d] text-white py-6 md:py-10 px-8 md:px-16 flex items-center">
+            <div class="max-w-6xl mx-auto w-full grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                
+                <!-- Hero Text -->
+                <div class="space-y-5">
+                    <h1 class="text-3xl md:text-5xl font-light tracking-tight leading-tight">
+                        {{ t.get('hero_h1_1', 'Learn Cybersecurity') }}<br><span class="font-normal">{{ t.get('hero_h1_2', 'the Smart Way') }}</span>
+                    </h1>
+                    <p class="text-xs md:text-sm text-blue-100/90 max-w-md leading-relaxed font-light">
+                        {{ t.get('hero_desc', 'Master online safety through AI-powered interactive learning. Available in English, French, and Arabic.') }}
+                    </p>
+                    <div class="pt-3">
+                        {% if current_user.is_authenticated %}
+                            <a href="/dashboard" class="inline-block bg-white text-blue-700 font-medium px-5 py-2 rounded-md text-xs hover:bg-blue-50 transition shadow-sm">
+                                {{ t.get('hero_btn_auth', 'Go to Dashboard') }}
+                            </a>
+                        {% else %}
+                            <a href="/register" class="inline-block bg-white text-blue-700 font-medium px-5 py-2 rounded-md text-xs hover:bg-blue-50 transition shadow-sm">
+                                {{ t.get('hero_btn_guest', 'Start Learning Now') }}
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Hero Graphic (Professional 3D Cyber Lock Graphic) -->
+                <div class="flex justify-center md:justify-end">
+                    <div class="relative w-64 h-64 md:w-80 md:h-80 flex items-center justify-center">
+                        
+                        <!-- Soft Cyan Ambient Glow -->
+                        <div class="absolute w-56 h-56 bg-cyan-500/20 rounded-full blur-3xl animate-pulse"></div>
+
+                        <svg class="w-full h-full relative z-10 drop-shadow-[0_15px_30px_rgba(0,0,0,0.35)]" viewBox="0 0 280 280" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <linearGradient id="ringGrad" x1="0" y1="0" x2="280" y2="280" gradientUnits="userSpaceOnUse">
+                                    <stop offset="0%" stop-color="#38bdf8"/>
+                                    <stop offset="50%" stop-color="#0284c7"/>
+                                    <stop offset="100%" stop-color="#0f172a"/>
+                                </linearGradient>
+
+                                <linearGradient id="shieldBg" x1="140" y1="20" x2="140" y2="260" gradientUnits="userSpaceOnUse">
+                                    <stop offset="0%" stop-color="#1e293b" stop-opacity="0.85"/>
+                                    <stop offset="100%" stop-color="#0f172a" stop-opacity="0.95"/>
+                                </linearGradient>
+
+                                <linearGradient id="shieldStroke" x1="40" y1="20" x2="240" y2="260" gradientUnits="userSpaceOnUse">
+                                    <stop offset="0%" stop-color="#38bdf8"/>
+                                    <stop offset="50%" stop-color="#06b6d4" stop-opacity="0.3"/>
+                                    <stop offset="100%" stop-color="#0284c7"/>
+                                </linearGradient>
+
+                                <linearGradient id="lockBody" x1="95" y1="130" x2="185" y2="200" gradientUnits="userSpaceOnUse">
+                                    <stop offset="0%" stop-color="#22d3ee"/>
+                                    <stop offset="40%" stop-color="#0284c7"/>
+                                    <stop offset="100%" stop-color="#0369a1"/>
+                                </linearGradient>
+
+                                <linearGradient id="shackleGrad" x1="105" y1="85" x2="175" y2="135" gradientUnits="userSpaceOnUse">
+                                    <stop offset="0%" stop-color="#e0f2fe"/>
+                                    <stop offset="50%" stop-color="#38bdf8"/>
+                                    <stop offset="100%" stop-color="#0284c7"/>
+                                </linearGradient>
+                            </defs>
+
+                            <circle cx="140" cy="140" r="115" stroke="url(#ringGrad)" stroke-width="1.5" stroke-dasharray="6 8" class="opacity-40"/>
+                            <circle cx="140" cy="140" r="128" stroke="#38bdf8" stroke-width="1" class="opacity-20"/>
+
+                            <circle cx="25" cy="140" r="3" fill="#38bdf8"/>
+                            <circle cx="255" cy="140" r="3" fill="#38bdf8"/>
+                            <circle cx="140" cy="25" r="3" fill="#38bdf8"/>
+
+                            <path d="M140 32 L225 68 V140 C225 195 140 242 140 242 C140 242 55 195 55 140 V68 L140 32 Z" 
+                                  fill="url(#shieldBg)" 
+                                  stroke="url(#shieldStroke)" 
+                                  stroke-width="2.5"/>
+
+                            <path d="M140 46 L212 76 V137 C212 184 140 224 140 224 C140 224 68 184 68 137 V76 L140 46 Z" 
+                                  stroke="#38bdf8" 
+                                  stroke-width="1" 
+                                  stroke-opacity="0.35" 
+                                  fill="none"/>
+
+                            <path d="M110 130 V102 C110 85.4315 123.431 72 140 72 C156.569 72 170 85.4315 170 102 V130" 
+                                  stroke="url(#shackleGrad)" 
+                                  stroke-width="10" 
+                                  stroke-linecap="round" 
+                                  fill="none"/>
+
+                            <rect x="96" y="125" width="88" height="68" rx="14" fill="url(#lockBody)" stroke="#e0f2fe" stroke-opacity="0.4" stroke-width="1"/>
+                            
+                            <path d="M113 125 V102 C113 87.098 125.098 75 140 75 C154.902 75 167 87.098 167 102 V125" 
+                                  stroke="#ffffff" 
+                                  stroke-width="2" 
+                                  stroke-opacity="0.5" 
+                                  stroke-linecap="round" 
+                                  fill="none"/>
+
+                            <circle cx="140" cy="153" r="6" fill="#0f172a"/>
+                            <path d="M137 156 L143 156 L145 172 L135 172 Z" fill="#0f172a"/>
+
+                            <circle cx="140" cy="153" r="2.5" fill="#38bdf8"/>
+                        </svg>
+
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 2. INTERACTIVE LEARNING FEATURES SECTION -->
+        <section class="bg-[#f8fafc] py-20 px-6 md:px-12 text-slate-800">
+            <div class="max-w-6xl mx-auto space-y-12">
+                
+                <div class="text-center space-y-3">
+                    <h2 class="text-2xl md:text-3xl font-light text-slate-900 tracking-wide">{{ t.get('features_h2', 'Interactive Learning Features') }}</h2>
+                    <p class="text-xs md:text-sm text-slate-500 max-w-2xl mx-auto font-light">
+                        {{ t.get('features_desc', 'Explore our comprehensive suite of learning tools designed to make cybersecurity education accessible and engaging for all students.') }}
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    
+                    <!-- Card 1: AI Chat Assistant -->
+                    <div onclick="window.location.href='/chat'" class="bg-white border border-slate-200/90 p-6 rounded-2xl text-center flex flex-col justify-between shadow-sm hover:border-blue-500 hover:shadow-xl transition-all duration-300 group cursor-pointer">
+                        <div class="space-y-4">
+                            <div class="w-12 h-12 bg-[#2563eb] text-white rounded-2xl flex items-center justify-center mx-auto shadow-md">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
+                                </svg>
+                            </div>
+                            <h3 class="font-normal text-slate-800 text-sm">{{ t.get('feat_ai_title', 'AI Chat Assistant') }}</h3>
+                            <p class="text-xs text-slate-500 leading-relaxed font-light">
+                                {{ t.get('feat_ai_desc', 'Ask questions about cybersecurity in your preferred language. Get instant, personalized answers from our intelligent AI assistant.') }}
+                            </p>
+                        </div>
+                        <div class="pt-6">
+                            <a href="/chat" class="inline-block text-xs font-medium text-blue-600 group-hover:text-blue-700 pt-1">{{ t.get('feat_link_features', 'Features →') }}</a>
+                        </div>
+                    </div>
+
+                    <!-- Card 2: Security Awareness Quiz -->
+                    <div {% if session.get('user_id') %}onclick="window.location.href='{{ url_for('quiz') }}'"{% else %}onclick="openLoginModal()"{% endif %} class="relative bg-white border border-slate-200/90 p-6 rounded-2xl text-center flex flex-col justify-between shadow-sm hover:border-blue-500 hover:shadow-xl transition-all duration-300 group cursor-pointer">
+                        
+                        {% if not session.get('user_id') %}
+                        <div class="absolute top-3.5 right-3.5 w-6 h-6 bg-slate-600/90 text-white rounded-md flex items-center justify-center shadow-sm">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                            </svg>
+                        </div>
+                        {% endif %}
+
+                        <div class="space-y-4">
+                            <div class="w-12 h-12 {% if session.get('user_id') %}bg-[#2563eb] shadow-md{% else %}bg-[#60a5fa] shadow-sm{% endif %} text-white rounded-2xl flex items-center justify-center mx-auto transition-all">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                                </svg>
+                            </div>
+                            <h3 class="font-normal {% if session.get('user_id') %}text-slate-800{% else %}text-slate-500{% endif %} text-sm">
+                                {{ t.get('feat_quiz_title', 'Security Awareness Quiz') }}
+                            </h3>
+                            <p class="text-xs {% if session.get('user_id') %}text-slate-500{% else %}text-slate-400{% endif %} leading-relaxed font-light">
+                                {{ t.get('feat_quiz_desc', 'Test your knowledge with interactive questions. Learn through engaging quizzes that adapt to your skill level.') }}
+                            </p>
+                        </div>
+
+                        <div class="pt-6">
+                            {% if session.get('user_id') %}
+                                <a href="{{ url_for('quiz') }}" class="inline-block text-xs font-medium text-blue-600 group-hover:text-blue-700 pt-1">Take Quiz →</a>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Card 3: Personal Security Dashboard -->
+                    <div {% if session.get('user_id') %}onclick="window.location.href='{{ url_for('dashboard') }}'"{% else %}onclick="openLoginModal()"{% endif %} class="relative bg-white border border-slate-200/90 p-6 rounded-2xl text-center flex flex-col justify-between shadow-sm hover:border-blue-500 hover:shadow-xl transition-all duration-300 group cursor-pointer">
+                        
+                        {% if not session.get('user_id') %}
+                        <div class="absolute top-3.5 right-3.5 w-6 h-6 bg-slate-600/90 text-white rounded-md flex items-center justify-center shadow-sm">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                            </svg>
+                        </div>
+                        {% endif %}
+
+                        <div class="space-y-4">
+                            <div class="w-12 h-12 {% if session.get('user_id') %}bg-[#2563eb] shadow-md{% else %}bg-[#60a5fa] shadow-sm{% endif %} text-white rounded-2xl flex items-center justify-center mx-auto transition-all">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                </svg>
+                            </div>
+                            <h3 class="font-normal {% if session.get('user_id') %}text-slate-800{% else %}text-slate-500{% endif %} text-sm">
+                                {{ t.get('feat_dash_title', 'Personal Security Dashboard') }}
+                            </h3>
+                            <p class="text-xs {% if session.get('user_id') %}text-slate-500{% else %}text-slate-400{% endif %} leading-relaxed font-light">
+                                {{ t.get('feat_dash_desc', 'Track your cybersecurity learning progress. Monitor completed lessons, quiz scores, and skill improvements over time.') }}
+                            </p>
+                        </div>
+
+                        <div class="pt-6">
+                            {% if session.get('user_id') %}
+                                <a href="{{ url_for('dashboard') }}" class="inline-block text-xs font-medium text-blue-600 group-hover:text-blue-700 pt-1">View Dashboard →</a>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Card 4: Security Reminders -->
+                    <div {% if session.get('user_id') %}onclick="window.location.href='{{ url_for('reminders') }}'"{% else %}onclick="openLoginModal()"{% endif %} class="relative bg-white border border-slate-200/90 p-6 rounded-2xl text-center flex flex-col justify-between shadow-sm hover:border-blue-500 hover:shadow-xl transition-all duration-300 group cursor-pointer">
+                        
+                        {% if not session.get('user_id') %}
+                        <div class="absolute top-3.5 right-3.5 w-6 h-6 bg-slate-600/90 text-white rounded-md flex items-center justify-center shadow-sm">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                            </svg>
+                        </div>
+                        {% endif %}
+
+                        <div class="space-y-4">
+                            <div class="w-12 h-12 {% if session.get('user_id') %}bg-[#2563eb] shadow-md{% else %}bg-[#60a5fa] shadow-sm{% endif %} text-white rounded-2xl flex items-center justify-center mx-auto transition-all">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                                </svg>
+                            </div>
+                            <h3 class="font-normal {% if session.get('user_id') %}text-slate-800{% else %}text-slate-500{% endif %} text-sm">
+                                {{ t.get('feat_rem_title', 'Security Reminders') }}
+                            </h3>
+                            <p class="text-xs {% if session.get('user_id') %}text-slate-500{% else %}text-slate-400{% endif %} leading-relaxed font-light">
+                                {{ t.get('feat_rem_desc', 'Set up custom reminders for security tasks. Never miss important updates, password changes, or learning milestones.') }}
+                            </p>
+                        </div>
+
+                        <div class="pt-6">
+                            {% if session.get('user_id') %}
+                                <a href="{{ url_for('reminders') }}" class="inline-block text-xs font-medium text-blue-600 group-hover:text-blue-700 pt-1">View Reminders →</a>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 3. HOW IT WORKS SECTION -->
+        <section class="bg-[#10245a] py-20 px-6 md:px-12 text-white">
+            <div class="max-w-5xl mx-auto space-y-12">
+                
+                <div class="text-center space-y-3">
+                    <h2 class="text-2xl md:text-3xl font-light">{{ t.get('how_h2', 'How It Works') }}</h2>
+                    <p class="text-xs md:text-sm text-blue-200/80 max-w-xl mx-auto font-light">
+                        {{ t.get('how_desc', 'Simple, secure, and smart. Get enterprise-level cybersecurity protection in three easy steps.') }}
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center relative">
+                    
+                    <!-- Step 1 -->
+                    <div class="space-y-4">
+                        <div class="relative w-16 h-16 bg-cyan-400 text-slate-900 rounded-full flex items-center justify-center mx-auto shadow-lg">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                            </svg>
+                            <span class="absolute -top-1 -right-1 w-6 h-6 bg-blue-600 text-white rounded-full text-xs font-bold flex items-center justify-center border-2 border-[#10245a]">1</span>
+                        </div>
+                        <h3 class="font-semibold text-sm">{{ t.get('how_step1_title', 'Start Conversation') }}</h3>
+                        <p class="text-xs text-blue-200/70 leading-relaxed max-w-xs mx-auto font-light">
+                            {{ t.get('how_step1_desc', 'Begin by chatting with our AI assistant about your cybersecurity concerns or questions.') }}
+                        </p>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="space-y-4">
+                        <div class="relative w-16 h-16 bg-cyan-400 text-slate-900 rounded-full flex items-center justify-center mx-auto shadow-lg">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                            <span class="absolute -top-1 -right-1 w-6 h-6 bg-blue-600 text-white rounded-full text-xs font-bold flex items-center justify-center border-2 border-[#10245a]">2</span>
+                        </div>
+                        <h3 class="font-semibold text-sm">{{ t.get('how_step2_title', 'Get Analysis') }}</h3>
+                        <p class="text-xs text-blue-200/70 leading-relaxed max-w-xs mx-auto font-light">
+                            {{ t.get('how_step2_desc', 'Our advanced AI analyzes threats, scans content, and evaluates your security posture in real time.') }}
+                        </p>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="space-y-4">
+                        <div class="relative w-16 h-16 bg-cyan-400 text-slate-900 rounded-full flex items-center justify-center mx-auto shadow-lg">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                            </svg>
+                            <span class="absolute -top-1 -right-1 w-6 h-6 bg-blue-600 text-white rounded-full text-xs font-bold flex items-center justify-center border-2 border-[#10245a]">3</span>
+                        </div>
+                        <h3 class="font-semibold text-sm">{{ t.get('how_step3_title', 'Stay Protected') }}</h3>
+                        <p class="text-xs text-blue-200/70 leading-relaxed max-w-xs mx-auto font-light">
+                            {{ t.get('how_step3_desc', 'Receive personalized recommendations and implement security measures to keep your data safe.') }}
+                        </p>
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 4. ABOUT THIS PROJECT SECTION -->
+        <section class="bg-slate-50 py-20 px-6 md:px-12 text-slate-800">
+            <div class="max-w-5xl mx-auto space-y-12">
+                
+                <div class="text-center space-y-3">
+                    <h2 class="text-2xl md:text-3xl font-light text-slate-900">{{ t.get('about_h2', 'About This Project') }}</h2>
+                    <p class="text-xs md:text-sm text-slate-500 max-w-2xl mx-auto font-light">
+                        {{ t.get('about_desc', 'This multilingual AI-based cybersecurity awareness platform is designed to help students improve their understanding of online security threats through interactive learning tools and AI-powered assistance.') }}
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    
+                    <!-- Card 1: AI-Powered Learning -->
+                    <div class="bg-white border border-slate-200/80 p-6 rounded-2xl text-center space-y-3 shadow-sm hover:shadow-md transition">
+                        <div class="w-10 h-10 bg-cyan-500 text-white rounded-xl flex items-center justify-center mx-auto">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 01-2 2h-0a2 2 0 01-2-2v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+                        </div>
+                        <h3 class="font-normal text-slate-900 text-sm">{{ t.get('about_card1_title', 'AI-Powered Learning') }}</h3>
+                        <p class="text-xs text-slate-500 leading-relaxed font-light">{{ t.get('about_card1_desc', 'Interactive chatbot that explains cybersecurity concepts in simple terms') }}</p>
+                    </div>
+
+                    <!-- Card 2: Interactive Quizzes -->
+                    <div class="bg-white border border-slate-200/80 p-6 rounded-2xl text-center space-y-3 shadow-sm hover:shadow-md transition">
+                        <div class="w-10 h-10 bg-cyan-500 text-white rounded-xl flex items-center justify-center mx-auto">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                        <h3 class="font-normal text-slate-900 text-sm">{{ t.get('about_card2_title', 'Interactive Quizzes') }}</h3>
+                        <p class="text-xs text-slate-500 leading-relaxed font-light">{{ t.get('about_card2_desc', 'Test your knowledge with engaging questions and instant feedback') }}</p>
+                    </div>
+
+                    <!-- Card 3: Multilingual Support -->
+                    <div class="bg-white border border-slate-200/80 p-6 rounded-2xl text-center space-y-3 shadow-sm hover:shadow-md transition">
+                        <div class="w-10 h-10 bg-cyan-500 text-white rounded-xl flex items-center justify-center mx-auto">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path></svg>
+                        </div>
+                        <h3 class="font-normal text-slate-900 text-sm">{{ t.get('about_card3_title', 'Multilingual Support') }}</h3>
+                        <p class="text-xs text-slate-500 leading-relaxed font-light">{{ t.get('about_card3_desc', 'Learn in English, French, or Arabic - accessible to all students') }}</p>
+                    </div>
+
+                    <!-- Card 4: Student-Focused -->
+                    <div class="bg-white border border-slate-200/80 p-6 rounded-2xl text-center space-y-3 shadow-sm hover:shadow-md transition">
+                        <div class="w-10 h-10 bg-cyan-500 text-white rounded-xl flex items-center justify-center mx-auto">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                        </div>
+                        <h3 class="font-normal text-slate-900 text-sm">{{ t.get('about_card4_title', 'Student-Focused') }}</h3>
+                        <p class="text-xs text-slate-500 leading-relaxed font-light">{{ t.get('about_card4_desc', 'Designed specifically for students with simple, clear explanations') }}</p>
+                    </div>
+
+                    <!-- Card 5: Practical Skills -->
+                    <div class="bg-white border border-slate-200/80 p-6 rounded-2xl text-center space-y-3 shadow-sm hover:shadow-md transition">
+                        <div class="w-10 h-10 bg-cyan-500 text-white rounded-xl flex items-center justify-center mx-auto">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                        </div>
+                        <h3 class="font-normal text-slate-900 text-sm">{{ t.get('about_card5_title', 'Practical Skills') }}</h3>
+                        <p class="text-xs text-slate-500 leading-relaxed font-light">{{ t.get('about_card5_desc', 'Learn to identify real threats like phishing, malware, and social engineering') }}</p>
+                    </div>
+
+                    <!-- Card 6: Progress Tracking -->
+                    <div class="bg-white border border-slate-200/80 p-6 rounded-2xl text-center space-y-3 shadow-sm hover:shadow-md transition">
+                        <div class="w-10 h-10 bg-cyan-500 text-white rounded-xl flex items-center justify-center mx-auto">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        </div>
+                        <h3 class="font-normal text-slate-900 text-sm">{{ t.get('about_card6_title', 'Progress Tracking') }}</h3>
+                        <p class="text-xs text-slate-500 leading-relaxed font-light">{{ t.get('about_card6_desc', 'Monitor your learning journey with personalized dashboards') }}</p>
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 5. PRIVACY & SECURITY SECTION -->
+        <section class="bg-slate-50 py-16 px-6 md:px-12 text-slate-800 border-t border-slate-200/60">
+            <div class="max-w-5xl mx-auto space-y-12">
+                
+                <div class="text-center space-y-3">
+                    <h2 class="text-2xl md:text-3xl font-light text-slate-900">{{ t.get('privacy_h2', 'Privacy & Security') }}</h2>
+                    <p class="text-xs md:text-sm text-slate-500 max-w-xl mx-auto font-light">
+                        {{ t.get('privacy_desc', 'Your privacy and security are our top priorities. Learn safely with peace of mind.') }}
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    
+                    <!-- Card 1: Encrypted AI Conversations -->
+                    <div class="bg-white border border-slate-200/80 p-6 rounded-2xl text-center space-y-3 shadow-sm hover:shadow-md transition">
+                        <div class="w-12 h-12 bg-blue-600 text-white rounded-2xl flex items-center justify-center mx-auto shadow-md">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                        </div>
+                        <h3 class="font-normal text-slate-900 text-sm">{{ t.get('privacy_card1_title', 'Encrypted AI Conversations') }}</h3>
+                        <p class="text-xs text-slate-500 leading-relaxed font-light">
+                            {{ t.get('privacy_card1_desc', 'All chat interactions are encrypted end-to-end, ensuring your questions and learning activities remain private and secure.') }}
+                        </p>
+                    </div>
+
+                    <!-- Card 2: Secure User Authentication -->
+                    <div class="bg-white border border-slate-200/80 p-6 rounded-2xl text-center space-y-3 shadow-sm hover:shadow-md transition">
+                        <div class="w-12 h-12 bg-blue-500 text-white rounded-2xl flex items-center justify-center mx-auto shadow-md">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                        </div>
+                        <h3 class="font-normal text-slate-900 text-sm">{{ t.get('privacy_card2_title', 'Secure User Authentication') }}</h3>
+                        <p class="text-xs text-slate-500 leading-relaxed font-light">
+                            {{ t.get('privacy_card2_desc', 'Protected login system with secure password storage and optional two-factor authentication to keep your account safe.') }}
+                        </p>
+                    </div>
+
+                    <!-- Card 3: GDPR-Compliant Data Handling -->
+                    <div class="bg-white border border-slate-200/80 p-6 rounded-2xl text-center space-y-3 shadow-sm hover:shadow-md transition">
+                        <div class="w-12 h-12 bg-blue-600 text-white rounded-2xl flex items-center justify-center mx-auto shadow-md">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                        <h3 class="font-normal text-slate-900 text-sm">{{ t.get('privacy_card3_title', 'GDPR-Compliant Data Handling') }}</h3>
+                        <p class="text-xs text-slate-500 leading-relaxed font-light">
+                            {{ t.get('privacy_card3_desc', 'We follow strict European data protection regulations, giving you full control over your personal information.') }}
+                        </p>
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- LOGIN REQUIRED POPUP MODAL -->
+    <div id="loginModal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4 transition-opacity">
+        <div class="bg-[#102a71] border border-blue-600/30 w-full max-w-md rounded-2xl p-7 text-center text-white shadow-2xl relative space-y-6">
+            
+            <!-- Close Icon -->
+            <button onclick="closeLoginModal()" class="absolute top-4 right-4 text-blue-200/60 hover:text-white transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+
+            <!-- Bright Blue Rounded Lock Icon Header -->
+            <div class="w-14 h-14 bg-[#2563eb] rounded-2xl flex items-center justify-center mx-auto shadow-lg pt-0.5">
+                <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                </svg>
+            </div>
+
+            <!-- Modal Content -->
+            <div class="space-y-2">
+                <h3 class="text-xl font-normal tracking-wide text-white">{{ t.get('modal_login_h3', 'Login Required') }}</h3>
+                <p class="text-xs text-blue-100/80 leading-relaxed font-light max-w-sm mx-auto">
+                    {{ t.get('modal_login_desc', 'Please log in or sign up to access this feature and unlock all the powerful learning tools available to you.') }}
+                </p>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="space-y-3 pt-2">
+                <a href="/login" class="block w-full py-2.5 bg-[#2563eb] hover:bg-blue-600 text-white font-medium text-xs rounded-lg transition shadow-md">
+                    {{ t.get('modal_login_btn', 'Log In / Sign Up') }}
+                </a>
+                <button onclick="closeLoginModal()" type="button" class="block w-full py-2.5 bg-white text-blue-500 font-medium text-xs rounded-lg hover:bg-blue-50 transition shadow-sm">
+                    {{ t.get('modal_cancel_btn', 'Cancel') }}
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- FOOTER SECTION -->
+    <footer class="bg-[#091124] text-white py-16 px-6 md:px-12 text-xs">
+        <div class="max-w-6xl mx-auto space-y-12">
+            
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-8">
+                
+                <div class="md:col-span-2 space-y-4">
+                    <div class="flex items-center gap-2 font-semibold text-base text-white">
+                        <div class="w-6 h-6 bg-blue-500 rounded-lg flex items-center justify-center">
+                            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                            </svg>
+                        </div>
+                        <span>{{ t.get('footer_brand', 'CyberLearn') }}</span>
+                    </div>
+                    <p class="text-slate-400 max-w-sm leading-relaxed font-light">
+                        {{ t.get('footer_desc', 'This multilingual AI-based cybersecurity awareness platform is designed to help students improve their understanding of online security threats through interactive learning tools.') }}
+                    </p>
+                </div>
+
+                <div class="space-y-3">
+                    <h4 class="font-normal text-white">{{ t.get('footer_platform_h', 'Platform') }}</h4>
+                    <ul class="space-y-2 text-slate-400 font-light">
+                        <li><a href="#" class="hover:text-white transition">{{ t.get('footer_link_features', 'Features') }}</a></li>
+                        <li><a href="/chat" class="hover:text-white transition">{{ t.get('footer_link_chat', 'AI Chat Assistant') }}</a></li>
+                        <li><a href="/quiz" class="hover:text-white transition">{{ t.get('footer_link_quiz', 'Security Quiz') }}</a></li>
+                        <li><a href="/dashboard" class="hover:text-white transition">{{ t.get('footer_link_dash', 'Dashboard') }}</a></li>
+                    </ul>
+                </div>
+
+                <div class="space-y-3">
+                    <h4 class="font-normal text-white">{{ t.get('footer_project_h', 'Project') }}</h4>
+                    <ul class="space-y-2 text-slate-400 font-light">
+                        <li><a href="#" class="hover:text-white transition">{{ t.get('footer_link_about', 'About the Project') }}</a></li>
+                        <li><a href="#" class="hover:text-white transition">{{ t.get('footer_link_research', 'Research Background') }}</a></li>
+                        <li><a href="#" class="hover:text-white transition">{{ t.get('footer_link_method', 'Methodology') }}</a></li>
+                        <li><a href="#" class="hover:text-white transition">{{ t.get('footer_link_docs', 'Documentation') }}</a></li>
+                    </ul>
+                </div>
+
+                <div class="space-y-3">
+                    <h4 class="font-normal text-white">{{ t.get('footer_resources_h', 'Resources') }}</h4>
+                    <ul class="space-y-2 text-slate-400 font-light">
+                        <li><a href="#" class="hover:text-white transition">{{ t.get('footer_link_tips', 'Cybersecurity Tips') }}</a></li>
+                        <li><a href="#" class="hover:text-white transition">{{ t.get('footer_link_modules', 'Learning Modules') }}</a></li>
+                        <li><a href="#" class="hover:text-white transition">{{ t.get('footer_link_help', 'Help Center') }}</a></li>
+                        <li><a href="#" class="hover:text-white transition">{{ t.get('footer_link_faq', 'FAQ') }}</a></li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <div class="pt-8 border-t border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4 text-slate-500 font-light">
+                <p>{{ t.get('footer_copy', '© 2026 CyberLearn Educational Platform. All rights reserved.') }}</p>
+                <p>{{ t.get('footer_tagline', 'Empowering students with cybersecurity knowledge') }}</p>
+            </div>
+
+        </div>
+    </footer>
+
+    <!-- INTERACTION SCRIPTS -->
+    <script>
+        // Language Selector Dropdown Logic
+        const btn = document.getElementById('langMenuBtn');
+        const dropdown = document.getElementById('langDropdown');
+        const selectedText = document.getElementById('selectedLangText');
+
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            dropdown.classList.toggle('hidden');
+        });
+
+        document.addEventListener('click', () => {
+            if (!dropdown.classList.contains('hidden')) {
+                dropdown.classList.add('hidden');
+            }
+        });
+
+        function selectLanguage(langCode) {
+            dropdown.classList.add('hidden');
+            // This correctly reloads the page with ?lang=en, ?lang=fr, or ?lang=ar
+            window.location.href = `?lang=${langCode}`;
+        }
+
+        // Login Modal Dialog Handlers
+        const loginModal = document.getElementById('loginModal');
+
+        function openLoginModal() {
+            loginModal.classList.remove('hidden');
+        }
+
+        function closeLoginModal() {
+            loginModal.classList.add('hidden');
+        }
+
+        // Close modal when clicking outside contents
+        loginModal.addEventListener('click', (e) => {
+            if (e.target === loginModal) {
+                closeLoginModal();
+            }
+        });
+    </script>
+
+</body>
+</html>

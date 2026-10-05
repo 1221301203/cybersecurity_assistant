@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="w-full max-w-[400px] bg-[#1e3a8a]/40 border border-white/15 p-8 rounded-2xl backdrop-blur-xl shadow-2xl space-y-6">
+    
+    <!-- Shield Icon Badge -->
+    <div class="flex justify-center">
+        <div class="w-12 h-12 bg-blue-500/20 border border-blue-400/40 rounded-xl flex items-center justify-center shadow-lg">
+            <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+            </svg>
+        </div>
+    </div>
+
+    <!-- Title and Subtitle -->
+    <div class="text-center space-y-1">
+        <h1 class="text-2xl font-semibold tracking-tight text-white">{{ t.get('welcome_back', 'Welcome Back') }}</h1>
+        <p class="text-xs text-blue-100/70">{{ t.get('login_subtitle', 'Log in to continue your cybersecurity learning journey') }}</p>
+    </div>
+
+    <!-- Form -->
+    <form action="/login" method="POST" class="space-y-4" id="login-form">
+        <!-- Email Input -->
+        <div class="space-y-1">
+            <label class="block text-xs font-medium text-white/90">{{ t.get('email', 'Email') }}</label>
+            <div class="relative">
+                <svg class="w-4 h-4 text-white/40 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 002-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                </svg>
+                <input type="email" id="email-input" name="email" required placeholder="{{ t.get('email_placeholder', 'you@example.com') }}" 
+                    class="w-full bg-[#0f172a]/50 border border-white/15 rounded-lg py-2 pl-9 pr-3 text-xs text-white placeholder-white/30 focus:outline-none focus:border-blue-400 transition">
+            </div>
+        </div>
+
+        <!-- Password Input -->
+        <div class="space-y-1">
+            <label class="block text-xs font-medium text-white/90">{{ t.get('password', 'Password') }}</label>
+            <div class="relative">
+                <svg class="w-4 h-4 text-white/40 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                </svg>
+                <input type="password" name="password" required placeholder="••••••••" 
+                    class="w-full bg-[#0f172a]/50 border border-white/15 rounded-lg py-2 pl-9 pr-3 text-xs text-white placeholder-white/30 focus:outline-none focus:border-blue-400 transition">
+            </div>
+        </div>
+
+        <!-- Checkbox & Link -->
+        <div class="flex items-center justify-between text-xs text-white/70 pt-1">
+            <label class="flex items-center gap-2 cursor-pointer select-none">
+                <input type="checkbox" name="remember" class="w-3.5 h-3.5 rounded bg-[#0f172a] border-white/20 text-blue-500 focus:ring-0">
+                <span>{{ t.get('remember_me', 'Remember me') }}</span>
+            </label>
+            <a href="/forgot-password" class="text-white/70 hover:text-white transition">{{ t.get('forgot_password', 'Forgot password?') }}</a>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="w-full py-2.5 bg-[#3b82f6] hover:bg-blue-600 text-white font-medium text-xs rounded-lg shadow-md transition mt-2">
+            {{ t.get('login_btn', 'Log In') }}
+        </button>
+
+        <!-- Biometric Login Button -->
+        <button type="button" id="biometric-btn" class="w-full py-2.5 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-medium text-xs rounded-lg shadow-md transition flex items-center justify-center gap-2">
+            <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.115 6.847A21.054 21.054 0 0112 21.5c-2.73 0-5.322-.556-7.696-1.556"></path>
+            </svg>
+            {{ t.get('login_biometric_btn', 'Log in with Biometrics') }}
+        </button>
+    </form>
+
+    <!-- Biometric Handler Script -->
+    <script>
+    document.getElementById('biometric-btn').addEventListener('click', async () => {
+        const email = document.getElementById('email-input').value.trim();
+        if (!email) {
+            alert('Please enter your email address first.');
+            return;
+        }
+
+        try {
+            // 1. Fetch options from backend
+            const optResponse = await fetch('/login-biometric-options', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: email })
+            });
+
+            if (!optResponse.ok) {
+                const errRes = await optResponse.json();
+                throw new Error(errRes.message || 'Failed to fetch login options');
+            }
+
+            const optionsJSON = await optResponse.json();
+
+            // 2. Parse options for the browser
+            const publicKeyCredentialRequestOptions = PublicKeyCredential.parseRequestOptionsFromJSON(optionsJSON);
+
+            // 3. Trigger Windows Hello / Biometric prompt
+            const credential = await navigator.credentials.get({
+                publicKey: publicKeyCredentialRequestOptions
+            });
+
+            // 4. Send credential to backend for verification
+            const response = await fetch('/login-biometric', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    email: email, 
+                    credential: credential.toJSON() 
+                })
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                window.location.href = result.redirect;
+            } else {
+                alert('Biometric authentication failed: ' + result.message);
+            }
+        } catch (err) {
+            console.error(err);
+            alert('Biometric authentication was canceled or failed: ' + err.message);
+        }
+    });
+</script>
+
+    <!-- Flash Messages with Auto-Fade -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div id="login-flash-messages" class="space-y-2 mb-6">
+            {% for category, message in messages %}
+                <div class="p-3 rounded-xl text-xs flex items-center justify-between shadow-sm transition-opacity duration-500 {% if category == 'danger' or category == 'error' %}bg-red-950/50 border border-red-500/40 text-red-300{% else %}bg-emerald-950/50 border border-emerald-500/40 text-emerald-300{% endif %}">
+                    <div class="flex items-center gap-2">
+                        <span>{{ message }}</span>
+                    </div>
+                    <button onclick="this.parentElement.remove()" class="text-current hover:text-white text-base font-bold px-1">&times;</button>
+                </div>
+            {% endfor %}
+        </div>
+        <script>
+            setTimeout(function() {
+                const flashBox = document.getElementById('login-flash-messages');
+                if (flashBox) {
+                    flashBox.style.opacity = '0';
+                    setTimeout(() => flashBox.remove(), 500);
+                }
+            }, 4000);
+        </script>
+    {% endif %}
+{% endwith %}
+
+    <!-- Footer Link -->
+    <p class="text-center text-xs text-white/70">
+        {{ t.get('dont_have_account', "Don't have an account?") }} 
+        <a href="/register" class="text-blue-400 hover:underline">{{ t.get('sign_up_here', 'Sign up here') }}</a>
+    </p>
+</div>
+{% endblock %}
